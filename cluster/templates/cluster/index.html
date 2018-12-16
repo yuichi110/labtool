@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+{% verbatim %}
+<div id="app">
+
+  <hr>
+  <pre>{{ $data }}</pre>
+</div>
+{% endverbatim %}
+
+<script src="{% static 'js/main.js' %}"></script>
+
+{% endblock %}
