@@ -5,6 +5,7 @@ import requests
 import sys
 import traceback
 import pprint
+import time
 
 import urllib3
 from urllib3.exceptions import InsecureRequestWarning
@@ -33,10 +34,45 @@ class TestRestApi():
     serverResponse = self.session.get(clusterURL)
     return serverResponse.status_code, json.loads(serverResponse.text)
 
-  def getNetworks(self):
-    networkURL = self.v2_url + '/networks'
-    serverResponse = self.session.get(networkURL)
+  def get_networks(self):
+    server_response = self.session.get(self.v2_url + '/networks')
+    if server_response.status_code != 200:
+      raise "Error"
+
+    networks = []
+    d = json.loads(server_response.text)
+    for network in d['entities']:
+      networks.append(network['name'])
+    return networks
+
+  def create_network(self, network_name, vlan):
+    payload = {
+      "name": network_name,
+      "vlan_id": str(vlan)
+    }
+    json_payload = json.dumps(payload)
+    serverResponse = self.session.post(self.v2_url + '/networks', data=json_payload)
     return serverResponse.status_code, json.loads(serverResponse.text)
+
+  def create_network_dhcp(self):
+    payload = {
+      "name": "vlan168",
+      "vlanId": "168",
+      "ipConfig": {
+        "dhcpOptions": {
+          "domainNameServers": "8.8.8.8"
+        },
+        "networkAddress": "10.149.168.0",
+        "prefixLength": "24",
+        "defaultGateway": "10.149.168.1",
+        "pool": [
+          {
+            "range": "10.149.168.50 10.149.168.99"
+          }
+        ]
+      }
+    }
+    pass
 
   def getVms(self):
     vmURL = self.v2_url + '/vms/'
@@ -48,27 +84,14 @@ class TestRestApi():
     serverResponse = self.session.get(vmURL)
     return serverResponse.status_code, json.loads(serverResponse.text)  
 
-  '''
-  def createVm(self):
-    payload = {
-      'memory_mb':1024,
-      'name':'test',
-      'num_vcpus':1,
-      'num_cores_per_vcpu':1,
-      'vm_disks':[
-      ]
-    }
-    json_payload = json.dumps(payload)
-    vmCreateURL = self.v2_url + '/vms'
-    serverResponse = self.session.post(vmCreateURL, data=json_payload)
-    return serverResponse.status_code, json.loads(serverResponse.text)   
-  '''
-
-  def get_storagePoolId(self, name):
+  def get_storagePoolId(self, name=None):
     serverResponse = self.session.get(self.v1_url + '/storage_pools')
     d = json.loads(serverResponse.text)
 
     for sp in d['entities']:
+      if name is None:
+        return sp['id']
+
       if sp['name'] == name:
         return sp['id']
 
@@ -82,7 +105,7 @@ class TestRestApi():
       if cont['name'] == name:
         return cont['containerUuid']
 
-    return ''
+    raise 'Entity does not exist.'
 
   def create_container(self, name, storagePoolId):
     payload = {
@@ -100,9 +123,13 @@ class TestRestApi():
     serverResponse = self.session.post(self.v1_url + '/containers', data=json_payload)
     return serverResponse.status_code, json.loads(serverResponse.text)
 
-  def get_images(self):
+  def get_image_names(self):
     serverResponse = self.session.get(self.v2_url + '/images')
-    return json.loads(serverResponse.text)
+    d = json.loads(serverResponse.text)
+    image_names = []
+    for image in d['entities']:
+      image_names.append(image['name'])
+    return image_names
 
   def create_image(self, image_name, file_url, container_uuid, image_type=None):
     if image_type is None:
@@ -191,16 +218,75 @@ class TestRestApi():
     return serverResponse.status_code, json.loads(serverResponse.text)
 
 
+def set_container(session, container):
+  counter = 0
+  while(True):
+    try:
+      container_uuid = session.get_container_uuid(container)
+      print('Container "{}" exist.'.format(container))
+      return container_uuid
 
-testRestApi = TestRestApi('10.149.160.41', 'admin', 'Nutanix/4u!')
-#spid = testRestApi.get_storagePoolId('default-storage-pool-58446')
-#testRestApi.create_container('container2', spid)
-#container_uuid = testRestApi.get_container_uuid('container')
+    except:
+      print('Container "{}" does not exist. Create.'.format(container))
+      spid = session.get_storagePoolId()
+      session.create_container(container, spid)
+    
+    counter += 1
+    if counter > 5:
+      break
+
+    time.sleep(3)
+
+  raise 'set_container failed'
+
+def set_images(session, image_tuples):
+  existing_image_names = session.get_image_names()
+
+  flag_create = False
+  for (image_name, image_url, container_uuid) in image_tuples:
+    if image_name in existing_image_names:
+      continue
+
+    flag_create = True
+    session.create_image(image_name, image_url, container_uuid)  
+
+  if not flag_create:
+    return
+
+def set_networks(session, network_tuples):
+  existing_network_names = session.get_networks()
+
+  flag_create = False
+  for (network_name, vlan) in network_tuples:
+    if network_name in existing_network_names:
+      continue
+
+    flag_create = False
+    session.create_network(network_name, vlan)
+
+  # check existance after image creation
+
+session = TestRestApi('10.149.160.41', 'admin', 'Nutanix/4u!')
+#session.create_network('vlan168', '168')
+#print(session.get_networks())
+
+'''
+container_uuid = set_container(session, 'container')
+
+set_images(session, [('ISO_CENT7_MIN', 'nfs://10.149.245.50/Public/bootcamp/centos7_min.iso', container_uuid), 
+  ('IMG_CENT7_MIN', 'nfs://10.149.245.50/Public/bootcamp/centos7_min_raw', container_uuid)])
+'''
+
+set_networks(session, [('vlan168-test', '168')])
+#print(session.get_image_names())
+
+
+#
 #testRestApi.create_image('centos7-iso2', 'nfs://10.149.245.50/Public/iso/linux/centos7_min.iso', container_uuid)
 #testRestApi.create_vm('test-vm', 1024, 1, 1, 'IMG_CENT7_MIN', 'vlan168', '10.149.168.52', 'ACROPOLIS')
 
-status, data = testRestApi.getClusterInformation()
-print(json.dumps(data, indent=2))
+#status, data = testRestApi.getClusterInformation()
+#print(json.dumps(data, indent=2))
 
 #print(container_uuid)
 
