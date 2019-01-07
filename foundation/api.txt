@@ -1,0 +1,322 @@
+http://10.149.160.5:8000/gui/app-extension/scripts/nutanix.min.js
+
+Request URL: http://10.149.160.5:8000/gui/index.html
+Request Method: GET
+
+(1) Get nics
+Request URL: http://10.149.160.5:8000/foundation/list_nics
+Request Method: GET
+{"eth0": {"ipv4": "10.149.160.5", "ipv6": "fe80::526b:8dff:fe7a:8cf0%eth0"}}
+
+(2) Choose nic
+Request URL: http://10.149.160.5:8000/foundation/primary_nic
+Request Method: POST
+{"primary_nic": "eth0"}
+
+(3) Get discovered nodes
+Request URL: http://10.149.160.5:8000/foundation/discover_nodes?_=1545952873582
+Request Method: GET
+[{"model": "NX-3060-G5", "nodes": [{"foundation_version": "foundation-4.2-890e0486", "ipmi_mac": null, "ipv6_address": "fe80::526b:8dff:fe6c:c882%eth0", "node_uuid": "4bf73bf5-e3cc-4508-9ce2-6a01ba61c429", "current_network_interface": "eth0", "node_position": "C", "hypervisor": "kvm", "svm_ip": "10.149.160.33", "nos_version": "5.5.7.1", "cluster_id": 58446, "current_cvm_vlan_tag": null, "hypervisor_version": "el6.nutanix.20170830.120", "attributes": {"lcm_family": "smc_gen_10", "minimal_compute_node": false, "default_workload": "vdi"}, "model": "NX-3060-G5", "configured": false}, {"foundation_version": "foundation-4.2-890e0486", "ipmi_mac": null, "ipv6_address": "fe80::526b:8dff:fee4:13ad%eth0", "node_uuid": "ca6d2e0f-517d-4b2b-ba7d-1053b0115944", "current_network_interface": "eth0", "node_position": "B", "hypervisor": "kvm", "svm_ip": "10.149.160.32", "nos_version": "5.5.7.1", "cluster_id": 58446, "current_cvm_vlan_tag": null, "hypervisor_version": "el6.nutanix.20170830.120", "attributes": {"lcm_family": "smc_gen_10", "minimal_compute_node": false, "default_workload": "vdi"}, "model": "NX-3060-G5", "configured": false}, {"foundation_version": "foundation-4.2-890e0486", "ipmi_mac": null, "ipv6_address": "fe80::526b:8dff:fea3:d3e6%eth0", "node_uuid": "140e6f04-7e0d-4bac-8025-915f1ff62eb5", "current_network_interface": "eth0", "node_position": "D", "hypervisor": "kvm", "svm_ip": "10.149.160.34", "nos_version": "5.5.7.1", "cluster_id": 58446, "current_cvm_vlan_tag": null, "hypervisor_version": "el6.nutanix.20170830.120", "attributes": {"lcm_family": "smc_gen_10", "minimal_compute_node": false, "default_workload": "vdi"}, "model": "NX-3060-G5", "configured": false}, {"foundation_version": "foundation-4.2-890e0486", "ipmi_mac": null, "ipv6_address": "fe80::526b:8dff:fe21:bd5e%eth0", "node_uuid": "d6082a90-7881-4018-8dc0-31637d327d87", "current_network_interface": "eth0", "node_position": "A", "hypervisor": "kvm", "svm_ip": "10.149.160.31", "nos_version": "5.5.7.1", "cluster_id": 58446, "current_cvm_vlan_tag": null, "hypervisor_version": "el6.nutanix.20170830.120", "attributes": {"lcm_family": "smc_gen_10", "minimal_compute_node": false, "default_workload": "vdi"}, "model": "NX-3060-G5", "configured": false}], "block_id": "16SM6B340111", "chassis_n": 4}]
+
+
+Request URL: http://10.149.160.5:8000/foundation/get_whitelist?__=1545953355491
+Request Method: GET
+{
+  "last_modified": 1537480070, 
+  "iso_whitelist": {
+    "e31ee7f6f2903b6b87ccc95e5ed75feb": {
+      "min_foundation": "3.10", 
+      "hypervisor": "esx", 
+...
+
+
+Request URL: http://10.149.160.5:8000/foundation/pre_check
+Request Method: POST
+{"bond_mode":"","bond_lacp_rate":null,"ui_is_installing_cvm":true,"ui_is_installing_hypervisor":true,"ui_is_installing_secondary_hypervisor":false,"hypervisor_iso":{"kvm":{"filename":"AHV bundled with AOS (version 4.6+)","checksum":null}},"nos_package":"nutanix_installer_package-release-euphrates-5.5.2-stable.tar","ui_nic":"eth0","hypervisor":"kvm","hyperv_sku":null,"ipmi_netmask":"255.255.252.0","hypervisor_netmask":"255.255.252.0","cvm_netmask":"255.255.252.0","ipmi_gateway":"10.149.160.1","hypervisor_gateway":"10.149.160.1","cvm_gateway":"10.149.160.1","clusters":[{"redundancy_factor":2,"timezone":"Asia/Tokyo","cluster_members":["10.149.160.31","10.149.160.32","10.149.160.33","10.149.160.34"],"cluster_name":"Training-01","cvm_ntp_servers":"ntp.nict.jp","cluster_external_ip":"10.149.160.41","cvm_dns_servers":"8.8.8.8","cluster_init_now":true,"cluster_init_successful":null}],"blocks":[{"model":"NX-3060-G5","nodes":[{"foundation_version":"foundation-4.2-890e0486","ipv6_address":"fe80::526b:8dff:fe21:bd5e%eth0","node_uuid":"d6082a90-7881-4018-8dc0-31637d327d87","current_network_interface":"eth0","node_position":"A","hypervisor":"kvm","svm_ip":"10.149.160.31","nos_version":"5.5.7.1","cluster_id":58446,"current_cvm_vlan_tag":null,"hypervisor_version":"el6.nutanix.20170830.120","attributes":{"lcm_family":"smc_gen_10","minimal_compute_node":false,"default_workload":"vdi"},"model":"NX-3060-G5","configured":false,"ui_node_id":"d6082a90-7881-4018-8dc0-31637d327d87","ui_existing_hypervisor":"kvm","is_selected":true,"cvm_ip":"10.149.160.31","hypervisor_ip":"10.149.160.21","ipmi_ip":"10.149.160.11","hypervisor_hostname":"AHV-1","hardware_attributes_override":{"minimal_compute_node":false},"cvm_gb_ram":null,"ipmi_configure_now":true,"image_now":true,"image_successful":null,"device_hint":"vm_installer"},{"foundation_version":"foundation-4.2-890e0486","ipv6_address":"fe80::526b:8dff:fee4:13ad%eth0","node_uuid":"ca6d2e0f-517d-4b2b-ba7d-1053b0115944","current_network_interface":"eth0","node_position":"B","hypervisor":"kvm","svm_ip":"10.149.160.32","nos_version":"5.5.7.1","cluster_id":58446,"current_cvm_vlan_tag":null,"hypervisor_version":"el6.nutanix.20170830.120","attributes":{"lcm_family":"smc_gen_10","minimal_compute_node":false,"default_workload":"vdi"},"model":"NX-3060-G5","configured":false,"ui_node_id":"ca6d2e0f-517d-4b2b-ba7d-1053b0115944","ui_existing_hypervisor":"kvm","is_selected":true,"cvm_ip":"10.149.160.32","hypervisor_ip":"10.149.160.22","ipmi_ip":"10.149.160.12","hypervisor_hostname":"AHV-2","hardware_attributes_override":{"minimal_compute_node":false},"cvm_gb_ram":null,"ipmi_configure_now":true,"image_now":true,"image_successful":null,"device_hint":"vm_installer"},{"foundation_version":"foundation-4.2-890e0486","ipv6_address":"fe80::526b:8dff:fe6c:c882%eth0","node_uuid":"4bf73bf5-e3cc-4508-9ce2-6a01ba61c429","current_network_interface":"eth0","node_position":"C","hypervisor":"kvm","svm_ip":"10.149.160.33","nos_version":"5.5.7.1","cluster_id":58446,"current_cvm_vlan_tag":null,"hypervisor_version":"el6.nutanix.20170830.120","attributes":{"lcm_family":"smc_gen_10","minimal_compute_node":false,"default_workload":"vdi"},"model":"NX-3060-G5","configured":false,"ui_node_id":"4bf73bf5-e3cc-4508-9ce2-6a01ba61c429","ui_existing_hypervisor":"kvm","is_selected":true,"cvm_ip":"10.149.160.33","hypervisor_ip":"10.149.160.23","ipmi_ip":"10.149.160.13","hypervisor_hostname":"AHV-3","hardware_attributes_override":{"minimal_compute_node":false},"cvm_gb_ram":null,"ipmi_configure_now":true,"image_now":true,"image_successful":null,"device_hint":"vm_installer"},{"foundation_version":"foundation-4.2-890e0486","ipv6_address":"fe80::526b:8dff:fea3:d3e6%eth0","node_uuid":"140e6f04-7e0d-4bac-8025-915f1ff62eb5","current_network_interface":"eth0","node_position":"D","hypervisor":"kvm","svm_ip":"10.149.160.34","nos_version":"5.5.7.1","cluster_id":58446,"current_cvm_vlan_tag":null,"hypervisor_version":"el6.nutanix.20170830.120","attributes":{"lcm_family":"smc_gen_10","minimal_compute_node":false,"default_workload":"vdi"},"model":"NX-3060-G5","configured":false,"ui_node_id":"140e6f04-7e0d-4bac-8025-915f1ff62eb5","ui_existing_hypervisor":"kvm","is_selected":true,"cvm_ip":"10.149.160.34","hypervisor_ip":"10.149.160.24","ipmi_ip":"10.149.160.14","hypervisor_hostname":"AHV-4","hardware_attributes_override":{"minimal_compute_node":false},"cvm_gb_ram":null,"ipmi_configure_now":true,"image_now":true,"image_successful":null,"device_hint":"vm_installer"}],"block_id":"16SM6B340111","chassis_n":4,"ui_block_id":"16SM6B340111","ui_model":"NX-3060-G5"}]}
+=========
+{
+  "session_id": "20181227-153039-13"
+}
+
+
+Request URL: http://10.149.160.5:8000/foundation/ipmi_config
+Request Method: POST
+{"bond_mode":"","bond_lacp_rate":null,"ui_is_installing_cvm":true,"ui_is_installing_hypervisor":true,"ui_is_installing_secondary_hypervisor":false,"hypervisor_iso":{"kvm":{"filename":"AHV bundled with AOS (version 4.6+)","checksum":null}},"nos_package":"nutanix_installer_package-release-euphrates-5.5.2-stable.tar","ui_nic":"eth0","hypervisor":"kvm","hyperv_sku":null,"ipmi_netmask":"255.255.252.0","hypervisor_netmask":"255.255.252.0","cvm_netmask":"255.255.252.0","ipmi_gateway":"10.149.160.1","hypervisor_gateway":"10.149.160.1","cvm_gateway":"10.149.160.1","clusters":[{"redundancy_factor":2,"timezone":"Asia/Tokyo","cluster_members":["10.149.160.31","10.149.160.32","10.149.160.33","10.149.160.34"],"cluster_name":"Training-01","cvm_ntp_servers":"ntp.nict.jp","cluster_external_ip":"10.149.160.41","cvm_dns_servers":"8.8.8.8","cluster_init_now":true,"cluster_init_successful":null}],"blocks":[{"model":"NX-3060-G5","nodes":[{"foundation_version":"foundation-4.2-890e0486","ipv6_address":"fe80::526b:8dff:fe21:bd5e%eth0","node_uuid":"d6082a90-7881-4018-8dc0-31637d327d87","current_network_interface":"eth0","node_position":"A","hypervisor":"kvm","svm_ip":"10.149.160.31","nos_version":"5.5.7.1","cluster_id":58446,"current_cvm_vlan_tag":null,"hypervisor_version":"el6.nutanix.20170830.120","attributes":{"lcm_family":"smc_gen_10","minimal_compute_node":false,"default_workload":"vdi"},"model":"NX-3060-G5","configured":false,"ui_node_id":"d6082a90-7881-4018-8dc0-31637d327d87","ui_existing_hypervisor":"kvm","is_selected":true,"cvm_ip":"10.149.160.31","hypervisor_ip":"10.149.160.21","ipmi_ip":"10.149.160.11","hypervisor_hostname":"AHV-1","hardware_attributes_override":{"minimal_compute_node":false},"cvm_gb_ram":null,"ipmi_configure_now":true,"image_now":true,"image_successful":null,"device_hint":"vm_installer"},{"foundation_version":"foundation-4.2-890e0486","ipv6_address":"fe80::526b:8dff:fee4:13ad%eth0","node_uuid":"ca6d2e0f-517d-4b2b-ba7d-1053b0115944","current_network_interface":"eth0","node_position":"B","hypervisor":"kvm","svm_ip":"10.149.160.32","nos_version":"5.5.7.1","cluster_id":58446,"current_cvm_vlan_tag":null,"hypervisor_version":"el6.nutanix.20170830.120","attributes":{"lcm_family":"smc_gen_10","minimal_compute_node":false,"default_workload":"vdi"},"model":"NX-3060-G5","configured":false,"ui_node_id":"ca6d2e0f-517d-4b2b-ba7d-1053b0115944","ui_existing_hypervisor":"kvm","is_selected":true,"cvm_ip":"10.149.160.32","hypervisor_ip":"10.149.160.22","ipmi_ip":"10.149.160.12","hypervisor_hostname":"AHV-2","hardware_attributes_override":{"minimal_compute_node":false},"cvm_gb_ram":null,"ipmi_configure_now":true,"image_now":true,"image_successful":null,"device_hint":"vm_installer"},{"foundation_version":"foundation-4.2-890e0486","ipv6_address":"fe80::526b:8dff:fe6c:c882%eth0","node_uuid":"4bf73bf5-e3cc-4508-9ce2-6a01ba61c429","current_network_interface":"eth0","node_position":"C","hypervisor":"kvm","svm_ip":"10.149.160.33","nos_version":"5.5.7.1","cluster_id":58446,"current_cvm_vlan_tag":null,"hypervisor_version":"el6.nutanix.20170830.120","attributes":{"lcm_family":"smc_gen_10","minimal_compute_node":false,"default_workload":"vdi"},"model":"NX-3060-G5","configured":false,"ui_node_id":"4bf73bf5-e3cc-4508-9ce2-6a01ba61c429","ui_existing_hypervisor":"kvm","is_selected":true,"cvm_ip":"10.149.160.33","hypervisor_ip":"10.149.160.23","ipmi_ip":"10.149.160.13","hypervisor_hostname":"AHV-3","hardware_attributes_override":{"minimal_compute_node":false},"cvm_gb_ram":null,"ipmi_configure_now":true,"image_now":true,"image_successful":null,"device_hint":"vm_installer"},{"foundation_version":"foundation-4.2-890e0486","ipv6_address":"fe80::526b:8dff:fea3:d3e6%eth0","node_uuid":"140e6f04-7e0d-4bac-8025-915f1ff62eb5","current_network_interface":"eth0","node_position":"D","hypervisor":"kvm","svm_ip":"10.149.160.34","nos_version":"5.5.7.1","cluster_id":58446,"current_cvm_vlan_tag":null,"hypervisor_version":"el6.nutanix.20170830.120","attributes":{"lcm_family":"smc_gen_10","minimal_compute_node":false,"default_workload":"vdi"},"model":"NX-3060-G5","configured":false,"ui_node_id":"140e6f04-7e0d-4bac-8025-915f1ff62eb5","ui_existing_hypervisor":"kvm","is_selected":true,"cvm_ip":"10.149.160.34","hypervisor_ip":"10.149.160.24","ipmi_ip":"10.149.160.14","hypervisor_hostname":"AHV-4","hardware_attributes_override":{"minimal_compute_node":false},"cvm_gb_ram":null,"ipmi_configure_now":true,"image_now":true,"image_successful":null,"device_hint":"vm_installer"}],"block_id":"16SM6B340111","chassis_n":4,"ui_block_id":"16SM6B340111","ui_model":"NX-3060-G5"}]}
+============
+{
+  "hyperv_sku": null, 
+  "ipmi_netmask": "255.255.252.0", 
+  "ui_nic": "eth0", 
+  "cvm_gateway": "10.149.160.1", 
+  "ui_is_installing_secondary_hypervisor": false, 
+  "bond_lacp_rate": null, 
+  "blocks": [
+    {
+      "block_id": "16SM6B340111", 
+      "chassis_n": 4, 
+      "ui_model": "NX-3060-G5", 
+      "model": "NX-3060-G5", 
+      "ui_block_id": "16SM6B340111", 
+      "nodes": [
+        {
+          "ipv6_address": "fe80::526b:8dff:fe21:bd5e%eth0", 
+          "image_now": true, 
+          "ipmi_configure_successful": true, 
+          "svm_ip": "10.149.160.31", 
+          "cluster_id": 58446, 
+          "image_successful": null, 
+          "ui_node_id": "d6082a90-7881-4018-8dc0-31637d327d87", 
+          "foundation_version": "foundation-4.2-890e0486", 
+          "is_selected": true, 
+          "nos_version": "5.5.7.1", 
+          "ipmi_ip": "10.149.160.11", 
+          "hardware_attributes_override": {
+            "minimal_compute_node": false
+          }, 
+          "configured": false, 
+          "node_position": "A", 
+          "current_cvm_vlan_tag": null, 
+          "hypervisor_hostname": "AHV-1", 
+          "cvm_gb_ram": null, 
+          "ui_existing_hypervisor": "kvm", 
+          "device_hint": "vm_installer", 
+          "ipmi_message": "Configuring node to use IPMI IP 10.149.160.11 succeeded", 
+          "hypervisor_version": "el6.nutanix.20170830.120", 
+          "ipmi_configure_now": false, 
+          "hypervisor_ip": "10.149.160.21", 
+          "model": "NX-3060-G5", 
+          "node_uuid": "d6082a90-7881-4018-8dc0-31637d327d87", 
+          "current_network_interface": "eth0", 
+          "hypervisor": "kvm", 
+          "attributes": {
+            "lcm_family": "smc_gen_10", 
+            "minimal_compute_node": false, 
+            "default_workload": "vdi"
+          }, 
+          "cvm_ip": "10.149.160.31"
+        }, 
+        {
+          "ipv6_address": "fe80::526b:8dff:fee4:13ad%eth0", 
+          "image_now": true, 
+          "ipmi_configure_successful": true, 
+          "svm_ip": "10.149.160.32", 
+          "cluster_id": 58446, 
+          "image_successful": null, 
+          "ui_node_id": "ca6d2e0f-517d-4b2b-ba7d-1053b0115944", 
+          "foundation_version": "foundation-4.2-890e0486", 
+          "is_selected": true, 
+          "nos_version": "5.5.7.1", 
+          "ipmi_ip": "10.149.160.12", 
+          "hardware_attributes_override": {
+            "minimal_compute_node": false
+          }, 
+          "configured": false, 
+          "node_position": "B", 
+          "current_cvm_vlan_tag": null, 
+          "hypervisor_hostname": "AHV-2", 
+          "cvm_gb_ram": null, 
+          "ui_existing_hypervisor": "kvm", 
+          "device_hint": "vm_installer", 
+          "ipmi_message": "Configuring node to use IPMI IP 10.149.160.12 succeeded", 
+          "hypervisor_version": "el6.nutanix.20170830.120", 
+          "ipmi_configure_now": false, 
+          "hypervisor_ip": "10.149.160.22", 
+          "model": "NX-3060-G5", 
+          "node_uuid": "ca6d2e0f-517d-4b2b-ba7d-1053b0115944", 
+          "current_network_interface": "eth0", 
+          "hypervisor": "kvm", 
+          "attributes": {
+            "lcm_family": "smc_gen_10", 
+            "minimal_compute_node": false, 
+            "default_workload": "vdi"
+          }, 
+          "cvm_ip": "10.149.160.32"
+        }, 
+        {
+          "ipv6_address": "fe80::526b:8dff:fe6c:c882%eth0", 
+          "image_now": true, 
+          "ipmi_configure_successful": true, 
+          "svm_ip": "10.149.160.33", 
+          "cluster_id": 58446, 
+          "image_successful": null, 
+          "ui_node_id": "4bf73bf5-e3cc-4508-9ce2-6a01ba61c429", 
+          "foundation_version": "foundation-4.2-890e0486", 
+          "is_selected": true, 
+          "nos_version": "5.5.7.1", 
+          "ipmi_ip": "10.149.160.13", 
+          "hardware_attributes_override": {
+            "minimal_compute_node": false
+          }, 
+          "configured": false, 
+          "node_position": "C", 
+          "current_cvm_vlan_tag": null, 
+          "hypervisor_hostname": "AHV-3", 
+          "cvm_gb_ram": null, 
+          "ui_existing_hypervisor": "kvm", 
+          "device_hint": "vm_installer", 
+          "ipmi_message": "Configuring node to use IPMI IP 10.149.160.13 succeeded", 
+          "hypervisor_version": "el6.nutanix.20170830.120", 
+          "ipmi_configure_now": false, 
+          "hypervisor_ip": "10.149.160.23", 
+          "model": "NX-3060-G5", 
+          "node_uuid": "4bf73bf5-e3cc-4508-9ce2-6a01ba61c429", 
+          "current_network_interface": "eth0", 
+          "hypervisor": "kvm", 
+          "attributes": {
+            "lcm_family": "smc_gen_10", 
+            "minimal_compute_node": false, 
+            "default_workload": "vdi"
+          }, 
+          "cvm_ip": "10.149.160.33"
+        }, 
+        {
+          "ipv6_address": "fe80::526b:8dff:fea3:d3e6%eth0", 
+          "image_now": true, 
+          "ipmi_configure_successful": true, 
+          "svm_ip": "10.149.160.34", 
+          "cluster_id": 58446, 
+          "image_successful": null, 
+          "ui_node_id": "140e6f04-7e0d-4bac-8025-915f1ff62eb5", 
+          "foundation_version": "foundation-4.2-890e0486", 
+          "is_selected": true, 
+          "nos_version": "5.5.7.1", 
+          "ipmi_ip": "10.149.160.14", 
+          "hardware_attributes_override": {
+            "minimal_compute_node": false
+          }, 
+          "configured": false, 
+          "node_position": "D", 
+          "current_cvm_vlan_tag": null, 
+          "hypervisor_hostname": "AHV-4", 
+          "cvm_gb_ram": null, 
+          "ui_existing_hypervisor": "kvm", 
+          "device_hint": "vm_installer", 
+          "ipmi_message": "Configuring node to use IPMI IP 10.149.160.14 succeeded", 
+          "hypervisor_version": "el6.nutanix.20170830.120", 
+          "ipmi_configure_now": false, 
+          "hypervisor_ip": "10.149.160.24", 
+          "model": "NX-3060-G5", 
+          "node_uuid": "140e6f04-7e0d-4bac-8025-915f1ff62eb5", 
+          "current_network_interface": "eth0", 
+          "hypervisor": "kvm", 
+          "attributes": {
+            "lcm_family": "smc_gen_10", 
+            "minimal_compute_node": false, 
+            "default_workload": "vdi"
+          }, 
+          "cvm_ip": "10.149.160.34"
+        }
+      ]
+    }
+  ], 
+  "ui_is_installing_cvm": true, 
+  "hypervisor_netmask": "255.255.252.0", 
+  "bond_mode": "", 
+  "cvm_netmask": "255.255.252.0", 
+  "nos_package": "nutanix_installer_package-release-euphrates-5.5.2-stable.tar", 
+  "hypervisor_gateway": "10.149.160.1", 
+  "hypervisor_iso": {
+    "kvm": {
+      "checksum": null, 
+      "filename": "AHV bundled with AOS (version 4.6+)"
+    }
+  }, 
+  "ipmi_gateway": "10.149.160.1", 
+  "clusters": [
+    {
+      "cluster_external_ip": "10.149.160.41", 
+      "cluster_init_successful": null, 
+      "redundancy_factor": 2, 
+      "cluster_name": "Training-01", 
+      "cvm_ntp_servers": "ntp.nict.jp", 
+      "cluster_members": [
+        "10.149.160.31", 
+        "10.149.160.32", 
+        "10.149.160.33", 
+        "10.149.160.34"
+      ], 
+      "timezone": "Asia/Tokyo", 
+      "cvm_dns_servers": "8.8.8.8", 
+      "cluster_init_now": true
+    }
+  ], 
+  "hypervisor": "kvm", 
+  "ui_is_installing_hypervisor": true
+}
+
+
+
+
+Request URL: http://10.149.160.5:8000/foundation/image_nodes
+Request Method: POST
+{"bond_mode":"","bond_lacp_rate":null,"ui_is_installing_cvm":true,"ui_is_installing_hypervisor":true,"ui_is_installing_secondary_hypervisor":false,"hypervisor_iso":{"kvm":{"filename":"AHV bundled with AOS (version 4.6+)","checksum":null}},"nos_package":"nutanix_installer_package-release-euphrates-5.5.2-stable.tar","ui_nic":"eth0","hypervisor":"kvm","hyperv_sku":null,"ipmi_netmask":"255.255.252.0","hypervisor_netmask":"255.255.252.0","cvm_netmask":"255.255.252.0","ipmi_gateway":"10.149.160.1","hypervisor_gateway":"10.149.160.1","cvm_gateway":"10.149.160.1","clusters":[{"redundancy_factor":2,"timezone":"Asia/Tokyo","cluster_members":["10.149.160.31","10.149.160.32","10.149.160.33","10.149.160.34"],"cluster_name":"Training-01","cvm_ntp_servers":"ntp.nict.jp","cluster_external_ip":"10.149.160.41","cvm_dns_servers":"8.8.8.8","cluster_init_now":true,"cluster_init_successful":null}],"blocks":[{"model":"NX-3060-G5","nodes":[{"foundation_version":"foundation-4.2-890e0486","ipv6_address":"fe80::526b:8dff:fe21:bd5e%eth0","node_uuid":"d6082a90-7881-4018-8dc0-31637d327d87","current_network_interface":"eth0","node_position":"A","hypervisor":"kvm","svm_ip":"10.149.160.31","nos_version":"5.5.7.1","cluster_id":58446,"current_cvm_vlan_tag":null,"hypervisor_version":"el6.nutanix.20170830.120","attributes":{"lcm_family":"smc_gen_10","minimal_compute_node":false,"default_workload":"vdi"},"model":"NX-3060-G5","configured":false,"ui_node_id":"d6082a90-7881-4018-8dc0-31637d327d87","ui_existing_hypervisor":"kvm","is_selected":true,"cvm_ip":"10.149.160.31","hypervisor_ip":"10.149.160.21","ipmi_ip":"10.149.160.11","hypervisor_hostname":"AHV-1","hardware_attributes_override":{"minimal_compute_node":false},"cvm_gb_ram":null,"ipmi_configure_now":true,"image_now":true,"image_successful":null,"device_hint":"vm_installer"},{"foundation_version":"foundation-4.2-890e0486","ipv6_address":"fe80::526b:8dff:fee4:13ad%eth0","node_uuid":"ca6d2e0f-517d-4b2b-ba7d-1053b0115944","current_network_interface":"eth0","node_position":"B","hypervisor":"kvm","svm_ip":"10.149.160.32","nos_version":"5.5.7.1","cluster_id":58446,"current_cvm_vlan_tag":null,"hypervisor_version":"el6.nutanix.20170830.120","attributes":{"lcm_family":"smc_gen_10","minimal_compute_node":false,"default_workload":"vdi"},"model":"NX-3060-G5","configured":false,"ui_node_id":"ca6d2e0f-517d-4b2b-ba7d-1053b0115944","ui_existing_hypervisor":"kvm","is_selected":true,"cvm_ip":"10.149.160.32","hypervisor_ip":"10.149.160.22","ipmi_ip":"10.149.160.12","hypervisor_hostname":"AHV-2","hardware_attributes_override":{"minimal_compute_node":false},"cvm_gb_ram":null,"ipmi_configure_now":true,"image_now":true,"image_successful":null,"device_hint":"vm_installer"},{"foundation_version":"foundation-4.2-890e0486","ipv6_address":"fe80::526b:8dff:fe6c:c882%eth0","node_uuid":"4bf73bf5-e3cc-4508-9ce2-6a01ba61c429","current_network_interface":"eth0","node_position":"C","hypervisor":"kvm","svm_ip":"10.149.160.33","nos_version":"5.5.7.1","cluster_id":58446,"current_cvm_vlan_tag":null,"hypervisor_version":"el6.nutanix.20170830.120","attributes":{"lcm_family":"smc_gen_10","minimal_compute_node":false,"default_workload":"vdi"},"model":"NX-3060-G5","configured":false,"ui_node_id":"4bf73bf5-e3cc-4508-9ce2-6a01ba61c429","ui_existing_hypervisor":"kvm","is_selected":true,"cvm_ip":"10.149.160.33","hypervisor_ip":"10.149.160.23","ipmi_ip":"10.149.160.13","hypervisor_hostname":"AHV-3","hardware_attributes_override":{"minimal_compute_node":false},"cvm_gb_ram":null,"ipmi_configure_now":true,"image_now":true,"image_successful":null,"device_hint":"vm_installer"},{"foundation_version":"foundation-4.2-890e0486","ipv6_address":"fe80::526b:8dff:fea3:d3e6%eth0","node_uuid":"140e6f04-7e0d-4bac-8025-915f1ff62eb5","current_network_interface":"eth0","node_position":"D","hypervisor":"kvm","svm_ip":"10.149.160.34","nos_version":"5.5.7.1","cluster_id":58446,"current_cvm_vlan_tag":null,"hypervisor_version":"el6.nutanix.20170830.120","attributes":{"lcm_family":"smc_gen_10","minimal_compute_node":false,"default_workload":"vdi"},"model":"NX-3060-G5","configured":false,"ui_node_id":"140e6f04-7e0d-4bac-8025-915f1ff62eb5","ui_existing_hypervisor":"kvm","is_selected":true,"cvm_ip":"10.149.160.34","hypervisor_ip":"10.149.160.24","ipmi_ip":"10.149.160.14","hypervisor_hostname":"AHV-4","hardware_attributes_override":{"minimal_compute_node":false},"cvm_gb_ram":null,"ipmi_configure_now":true,"image_now":true,"image_successful":null,"device_hint":"vm_installer"}],"block_id":"16SM6B340111","chassis_n":4,"ui_block_id":"16SM6B340111","ui_model":"NX-3060-G5"}]}
+======
+{
+  "session_id": "20181227-153106-14"
+}
+
+
+Request URL: http://10.149.160.5:8000/foundation/progress?__=1545953581431
+Request Method: GET
+{
+  "abort_session": false, 
+  "results": null, 
+  "session_id": "20181227-153106-14", 
+  "imaging_stopped": false, 
+  "aggregate_percent_complete": 36.64, 
+  "action": "imaging", 
+  "clusters": [
+    {
+      "status": "Idle", 
+      "messages": [], 
+      "cluster_name": "Training-01", 
+      "time_elapsed": 0, 
+      "cluster_members": [
+        "10.149.160.31", 
+        "10.149.160.32", 
+        "10.149.160.33", 
+        "10.149.160.34"
+      ], 
+      "percent_complete": 0.0, 
+      "time_total": 9
+    }
+  ], 
+  "nodes": [
+    {
+      "status": "Rebooting into installer", 
+      "messages": [], 
+      "time_elapsed": 34.0, 
+      "cvm_ip": "10.149.160.32", 
+      "percent_complete": 37.55, 
+      "hypervisor_ip": "10.149.160.22", 
+      "time_total": 90.55000000000001
+    }, 
+    {
+      "status": "Rebooting into installer", 
+      "messages": [], 
+      "time_elapsed": 34.0, 
+      "cvm_ip": "10.149.160.34", 
+      "percent_complete": 37.55, 
+      "hypervisor_ip": "10.149.160.24", 
+      "time_total": 90.55000000000001
+    }, 
+    {
+      "status": "Rebooting into installer", 
+      "messages": [], 
+      "time_elapsed": 34.0, 
+      "cvm_ip": "10.149.160.31", 
+      "percent_complete": 37.55, 
+      "hypervisor_ip": "10.149.160.21", 
+      "time_total": 90.55000000000001
+    }, 
+    {
+      "status": "Rebooting into installer", 
+      "messages": [], 
+      "time_elapsed": 34.0, 
+      "cvm_ip": "10.149.160.33", 
+      "percent_complete": 37.55, 
+      "hypervisor_ip": "10.149.160.23", 
+      "time_total": 90.55000000000001
+    }
+  ]
+}

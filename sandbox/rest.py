@@ -270,12 +270,10 @@ session = TestRestApi('10.149.160.41', 'admin', 'Nutanix/4u!')
 #session.create_network('vlan168', '168')
 #print(session.get_networks())
 
-'''
 container_uuid = set_container(session, 'container')
 
 set_images(session, [('ISO_CENT7_MIN', 'nfs://10.149.245.50/Public/bootcamp/centos7_min.iso', container_uuid), 
   ('IMG_CENT7_MIN', 'nfs://10.149.245.50/Public/bootcamp/centos7_min_raw', container_uuid)])
-'''
 
 set_networks(session, [('vlan168-test', '168')])
 #print(session.get_image_names())

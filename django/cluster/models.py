@@ -2,6 +2,14 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.urls import reverse, reverse_lazy
 
+class Cluster(models.Model):
+  name = models.CharField(max_length=100)
+  user = models.CharField(max_length=100)
+  password = models.CharField(max_length=100)
+
+  def __str__(self):
+    return self.name
+
 '''
 class Cluster(models.Model):
   ipAddress = models.CharField(max_length=100, verbose_name='IP Address')

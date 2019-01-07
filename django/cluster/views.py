@@ -1,4 +1,7 @@
-from django.views.generic import TemplateView
+from rest_framework import generics
+from .models import Cluster
+from .serializers import ClusterSerializer
 
-class IndexView(TemplateView):
-  template_name = 'cluster/index.html'
+class ClusterAPIView(generics.ListAPIView):
+  queryset = Cluster.objects.all()
+  serializer_class = ClusterSerializer

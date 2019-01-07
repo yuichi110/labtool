@@ -5,6 +5,5 @@ import cluster.views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
-    path('', cluster.views.IndexView.as_view(), name='home'),
+    path('api/', cluster.views.ClusterAPIView.as_view())
 ]
