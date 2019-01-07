@@ -16,6 +16,7 @@ python3 -m venv venv
 source ./venv/bin/activate
 pip install django
 pip install djangorestframework
+pip install django-cors-headers
 python manage.py createsuperuser
 python manage.py makemigrations
 python manage.py migrate

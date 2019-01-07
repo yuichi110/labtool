@@ -4,4 +4,4 @@ from .models import Cluster
 class ClusterSerializer(serializers.ModelSerializer):
   class Meta:
     model = Cluster
-    fields = ['name', 'user', 'password']
+    fields = ['id', 'name', 'user', 'password']
