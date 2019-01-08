@@ -24,5 +24,6 @@ python manage.py migrate
 (3) Setup of Vue frontend
 brew install node
 npm install -g vue-cli
+
 vue init webpack my-project
 

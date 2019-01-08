@@ -11,8 +11,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
       port = 8000
     else:
       # go to web server (vue)
-      #port = 8080
-      port = 8000
+      port = 8080
 
     url = 'http://localhost:{}{}'.format(port, self.path)
     req = urllib.request.Request(url=url)
@@ -25,10 +24,10 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
         self.send_error(599, u'error proxying: {}'.format(unicode(e)))
         return
 
-    # code
+    # response code
     self.send_response(resp.getcode())
 
-    # header
+    # response header
     respheaders = resp.info()
     for line in respheaders.as_string().splitlines():
       line_parts = line.split(':', 1)
@@ -36,7 +35,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
         self.send_header(*line_parts)
     self.end_headers()
 
-    # body
+    # response body
     self.wfile.write(resp.read())
     return
 
