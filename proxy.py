@@ -40,4 +40,5 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
     return
 
 httpd = HTTPServer(('127.0.0.1', 80), ProxyHTTPRequestHandler)
+print('Python http proxy is running http://127.0.0.1/')
 httpd.serve_forever()

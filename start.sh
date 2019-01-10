@@ -5,42 +5,58 @@ printf "password: "
 read password
 
 # start django
+echo
+echo "(1) Starting Django(Backend) at port 8000"
+echo
 {
   cd django
   source venv/bin/activate
   python manage.py runserver
 } &
-pid_django=$!
+sleep 5;
 
 # start node(vue)
+echo
+echo "(2) Starting Node(Frontend) at port 8080"
+echo
 { 
   cd vue
   npm start
 } &
-pid_node=$!
+sleep 5;
 
-# start proxy with password
+# start proxy with sudo
+echo
+echo "(3) Starting Python HTTP Proxy at port 80"
+echo
 {
   echo "$password" | sudo -S python3 proxy.py
 } &
-pid_proxy=$!
 
 ctrc()
 {
-  # kill proxy
+  # kill proxy with sudo
   {
     pid_port80=`echo "$password" | sudo -S lsof -ti tcp:80`
-    echo "$password" | sudo -S kill -9 $pid_port80
+    if [ $pid_port80 ]; then
+      echo "$password" | sudo -S kill -9 $pid_port80
+    fi
   } &
 
   # kill node(vue)
   {
-    kill -9 $(lsof -ti tcp:8000)
+    pid_port8000=`lsof -ti tcp:8000`
+    if [ $pid_port8000 ]; then
+      kill -9 $pid_port8000
+    fi
   } &
 
   # kill django
   {
-    kill -9 $(lsof -ti tcp:8080)
+    pid_port8080=`lsof -ti tcp:8080`
+    if [ $pid_port8080 ]; then
+      kill -9 $pid_port8080
+    fi
   } &
 
   wait
@@ -48,4 +64,4 @@ ctrc()
 }
 
 trap ctrc SIGINT
-while : ; do : ; done
+while : ; do sleep 1 ; done
