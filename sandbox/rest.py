@@ -11,6 +11,10 @@ import urllib3
 from urllib3.exceptions import InsecureRequestWarning
 urllib3.disable_warnings(InsecureRequestWarning)
 
+ADDRESS = '10.149.161.41'
+USER = 'admin'
+PASSWORD = 'Nutanix/4u!'
+
 class TestRestApi():                
   def __init__(self, ipAddress, username, password):    
     self.serverIpAddress = ipAddress
@@ -266,7 +270,7 @@ def set_networks(session, network_tuples):
 
   # check existance after image creation
 
-session = TestRestApi('10.149.160.41', 'admin', 'Nutanix/4u!')
+session = TestRestApi(ADDRESS, USER, PASSWORD)
 #session.create_network('vlan168', '168')
 #print(session.get_networks())
 

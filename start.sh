@@ -2,7 +2,7 @@
 
 # get password
 printf "password: "
-read password
+read -s password
 
 # start django
 echo
@@ -23,7 +23,7 @@ echo
   cd vue
   npm start
 } &
-sleep 5;
+sleep 10;
 
 # start proxy with sudo
 echo

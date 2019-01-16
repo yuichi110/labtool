@@ -1,21 +1,20 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Index from '@/views/Index'
-import Cluster from '@/views/Cluster'
-
+import IndexView from '@/views/IndexView'
+import ClusterDetailView from '@/views/ClusterDetailView'
 Vue.use(Router)
 
 export default new Router({
   routes: [
     {
       path: '/',
-      name: 'Index',
-      component: Index,
+      name: 'IndexView',
+      component: IndexView,
     },
     {
       path: '/cluster/:id',
-      name: 'Cluster',
-      component: Cluster,
+      name: 'ClusterDetailView',
+      component: ClusterDetailView,
     },
   ]
 })
