@@ -1,10 +1,11 @@
 #!/usr/bin/env bash 
 
 printf "password: "
-read password
+read -s password
 
 {
   pid_port80=`echo "$password" | sudo -S lsof -ti tcp:80`
+  echo $pid_port80
   if [ $pid_port80 ]; then
     echo "$password" | sudo -S kill -9 $pid_port80
   fi
