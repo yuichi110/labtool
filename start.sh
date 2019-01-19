@@ -30,7 +30,7 @@ echo
 echo "(3) Starting Python HTTP Proxy at port 80"
 echo
 {
-  echo "$password" | sudo -S python3 proxy.py
+  echo "$password" | sudo -S python proxy.py
 } &
 
 ctrc()
