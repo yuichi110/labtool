@@ -7,4 +7,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/cluster/', cluster.apis.ListCluster.as_view()),
     path('api/cluster/<int:pk>', cluster.apis.DetailCluster.as_view()),
+    path('test', cluster.apis.test)
 ]

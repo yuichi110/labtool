@@ -1,4 +1,28 @@
-# For __main__
+'''
+Python HTTP Proxy.
+Proxy HTTP requests to upstram servers via URL pattern.
+Authour: Yuichi Ito
+Email: yuichi@yuichi.com
+
+
+How to use
+(1) As main Proxy Server program.
+Update 
+ - LISTEN_IP
+ - LISTEN_PORT
+ - PROXY_RULE
+And then, run this program file.
+
+I'm using this program as proxy server for frontend(Node) and backend(Django) on dev.
+But, using NGINX in production.
+
+(2) Make Proxy Server instance
+Import this module and call get_HTTPServer_instance on another module.
+Please check "call_proxy_sample.py" for details.
+'''
+
+
+# CONSTANT PARAMS ONLY FOR (1)
 LISTEN_IP = '127.0.0.1'
 LISTEN_PORT = 80
 PROXY_RULE = [
@@ -6,12 +30,11 @@ PROXY_RULE = [
   ('127.0.0.1', 8080, ['.*']),
 ]
 
-# For lib.
-def get_proxy_instance(ip, port, proxy_rule):
-  def handler(*args):
-    return ProxyHTTPRequestHandler(proxy_rule, *args)
-  return HTTPServer((ip, port), handler)
 
+# PUBLIC FUNCTION FOR (2)
+def get_HTTPServer_instance(ip, port, proxy_rule):
+  # raise Exception if parameters have problem.
+  return _get_HTTPServer_instance(ip, port, proxy_rule)
 
 
 
@@ -22,7 +45,6 @@ if sys.version_info.major == 3:
   from urllib.request import HTTPErrorProcessor, Request, build_opener
   from urllib.error import HTTPError, URLError
   RequestWithMethod = Request
-
 elif sys.version_info.major == 2:
   from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
   from urllib2 import HTTPErrorProcessor, Request, build_opener
@@ -33,14 +55,17 @@ elif sys.version_info.major == 2:
       Request.__init__(self, *args, **kwargs)
     def get_method(self):
       return self._method
+else:
+  sys.exit('Python HTTP Proxy: Not supported on your Python version. Exit.')
 
-# Handler for avoid 302 redirection on urllib Request.
-class NoRedirectProcessor(HTTPErrorProcessor):
+# Handler for avoiding url redirection(302) at urllib Request.
+class _NoRedirectProcessor(HTTPErrorProcessor):
   def http_response(self, request, response):
     return response
   https_response = http_response
   
-class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
+# Proxy Handler
+class _ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
 
   def __init__(self, proxy_rule, *args):
     proxy_matcher_list = []
@@ -87,7 +112,7 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
       req = RequestWithMethod(method=method, url=url, headers=header_dict, data=body)
 
     # Build opener which avoid URL redirection.
-    opener = build_opener(NoRedirectProcessor)
+    opener = build_opener(_NoRedirectProcessor)
 
     # Access to the upstream server and get response.
     try:
@@ -147,6 +172,60 @@ class ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
     self.proxy('OPTIONS')
 
 
+def _get_HTTPServer_instance(ip, port, proxy_rule):
+  import socket
+  def is_ip_ok(ip):
+    try:
+      socket.inet_aton(ip)
+    except socket.error:
+      return False
+    return True
+
+  def is_port_ok(port):
+    port_ok = True
+    if type(port) is not int:
+      port_ok = False
+    if port < 0:
+      port_ok = False
+    if port > 65535:
+      port_ok = False
+    return port_ok
+
+  # IP check
+  if not is_ip_ok(ip):
+    raise Exception('Illegal IP address string "{}" is passed'.format(ip)) 
+
+  # Port check
+  if not is_port_ok(port):
+    raise Exception('Illegal Port number "{}" is passed'.format(port))
+
+  # Proxy rule check
+  for (proxy_ip, proxy_port, urlpat_list) in proxy_rule:
+    if not is_ip_ok(proxy_ip):
+      raise Exception('Illegal IP address string "{}" is in proxy_rule'.format(ip))
+
+    if not is_port_ok(proxy_port):
+      raise Exception('Illegal Port number "{}" is in proxy_rule'.format(port))
+
+    for urlpat in urlpat_list:
+      is_ok = True
+      try:
+        # through Exception if urlpat contains illegal ascii chars
+        re.compile(urlpat)
+      except:
+        is_ok = False
+      if not is_ok:
+        raise Exception('Illegal Regex pattern "{}" is in proxy_rule'.format(urlpat))
+
+  # All params are OK. 
+  # Create handler with proxy rule
+  def handler(*args):
+    return _ProxyHTTPRequestHandler(proxy_rule, *args)
+
+  # Build HTTP Server
+  httpd = HTTPServer((ip, port), handler)
+
+  return httpd
 
 
 if __name__ == '__main__':
