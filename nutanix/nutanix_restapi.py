@@ -866,6 +866,62 @@ class NutanixRestApiClient:
   ### Developing now
   ###
 
+  def make_pc(self, version, container, ip, network, subnetmask, gateway):
+    pass
+    '''
+    Request URL: https://10.149.161.41:9440/api/nutanix/v3/prism_central
+    Request Method: POST
+
+    Payload
+    {
+       "resources":{
+          "version":"5.10.3",
+          "should_auto_register":false,
+          "pc_vm_list":[
+             {
+                "vm_name":"PrismCentral",
+                "container_uuid":"0fc0176b-7eac-4fb0-a27d-9069bc3cf371",
+                "num_sockets":4,
+                "data_disk_size_bytes":536870912000,
+                "memory_size_bytes":17179869184,
+                "dns_server_ip_list":[
+                   "8.8.8.8"
+                ],
+                "nic_list":[
+                   {
+                      "ip_list":[
+                         "10.149.161.42"
+                      ],
+                      "network_configuration":{
+                         "network_uuid":"a134b6d8-6e4d-4dea-9aa3-c6d225ffdb3b",
+                         "subnet_mask":"255.255.252.0",
+                         "default_gateway":"10.149.160.1"
+                      }
+                   }
+                ]
+             }
+          ]
+       }
+    }
+    '''
+
+  def register_pc(self):
+    pass
+    '''
+    https://10.149.161.41:9440/PrismGateway/services/rest/v1/multicluster/add_to_multicluster
+    Request Method: POST
+    Status Code: 200 OK
+
+    {
+       "ipAddresses":[
+          "10.149.161.42"
+       ],
+       "username":"admin",
+       "password":"Nutanix/4u!"
+    }
+    '''
+
+
   def set_eula(self, user_name, company_name, job_title):
     error_dict = {}
     try:

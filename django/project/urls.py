@@ -1,11 +1,23 @@
 from django.contrib import admin
 from django.urls import path
 
-import cluster.apis
+from asset.apis import AssetApi
+from segment.apis import SegmentApi
+from cluster.apis import ClusterApi
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/cluster/', cluster.apis.ListCluster.as_view()),
-    path('api/cluster/<int:pk>', cluster.apis.DetailCluster.as_view()),
-    path('test', cluster.apis.test)
+    path('api/assets', AssetApi.assets),
+    path('api/assets/', AssetApi.assets),
+    path('api/assets/<str:uuid>', AssetApi.asset),
+
+    path('api/segments', SegmentApi.segments),
+    path('api/segments/', SegmentApi.segments),
+    path('api/segments/<str:uuid>', SegmentApi.segment),
+
+    path('api/clusters', ClusterApi.clusters),
+    path('api/clusters/', ClusterApi.clusters),
+    path('api/clusters/<str:uuid>', ClusterApi.cluster),
+    
+    path('test', ClusterApi.test),
 ]
