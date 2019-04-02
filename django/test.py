@@ -67,3 +67,10 @@ for (asset_name, asset_uuid) in asset_uuid_dict.items():
   response = requests.post('http://127.0.0.1:8000/api/clusters', data=request_body)
   uuid = response.json()['uuid']
   print(' - {}'.format(uuid))
+
+print('Deleting clusters, segments, assets')
+response = requests.get('http://127.0.0.1:8000/api/clusters')
+for cluster in response.json():
+  print('----')
+  print(json.dumps(cluster, indent=2))
+  

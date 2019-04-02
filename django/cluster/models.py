@@ -18,4 +18,29 @@ class Cluster(models.Model):
     return 'Asset:{}, Segment:{}, UUID:{}'.format(self.asset.name, self.segment.name, self.uuid)
 
   def data(self):
-    return ''
+    asset_dict = json.loads(self.asset.data)
+    segment_dict = json.loads(self.segment.data)
+
+    if 'alias' in segment_dict:
+      asset_nodes = asset_dict['nodes']
+      segment_nodes = segment_dict['alias']['nodes']
+      n = min(len(asset_nodes), len(segment_nodes))
+      new_segment_nodes = []
+      for i in range(n):
+        segment_nodes[i]['ipmi_mac'] = asset_nodes[i]['ipmi_mac']
+        new_segment_nodes.append(segment_nodes[i])
+      segment_dict['alias']['nodes'] = new_segment_nodes
+      asset_dict = segment_dict['alias']
+      del segment_dict['alias']
+
+    cluster_dict = segment_dict
+    for (key, value) in asset_dict.items():
+      cluster_dict[key] = value
+    cluster_dict['uuid'] = str(self.uuid)
+    cluster_dict['name'] = self.asset.name
+    cluster_dict['asset_uuid'] = str(self.asset.uuid)
+    cluster_dict['asset_name'] = self.asset.name
+    cluster_dict['segment_uuid'] = str(self.segment.uuid)
+    cluster_dict['segment_name'] = self.segment.name
+    
+    return cluster_dict

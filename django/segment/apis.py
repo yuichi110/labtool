@@ -19,18 +19,13 @@ class SegmentApi:
     
     def post(request):
       try:
-        text = request.body.decode()
-        d = json.loads(text)
-        name = d['name']
-        segment_object = Segment.objects.create(name=name, data='')
-        d['uuid'] = str(segment_object.uuid)
-        segment_object.data = json.dumps(d, indent=2)
-        segment_object.save()
+        json_text = request.body.decode()
+        data = Segment.create(json_text)
       except Exception as e:
         print(e)
         response_body = json.dumps({'error':"request body has problem"}, indent=2)
         return HttpResponseBadRequest(response_body, content_type='application/json')
-      return HttpResponse(segment_object.data, content_type='application/json')
+      return HttpResponse(data, content_type='application/json')
 
     if request.method == 'GET':
       return get(request)
@@ -49,13 +44,8 @@ class SegmentApi:
 
     def put(request, uuid):
       try:
-        segment_object = Segment.objects.filter(uuid=uuid)[0]
-        text = request.body.decode()
-        d = json.loads(text)
-        d['uuid'] = str(segment_object.uuid)
-        segment_object.name = d['name']
-        segment_object.data = json.dumps(d, indent=2)
-        segment_object.save()
+        json_text = request.body.decode()
+        Segment.update(uuid, json_text)
       except Exception as e:
         print(e)
         response_body = json.dumps({'error':"request body has problem"}, indent=2)

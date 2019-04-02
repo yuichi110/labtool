@@ -18,13 +18,15 @@ class ClusterApi:
       cluster_objects = Cluster.objects.all()
       cluster_list = []
       for cluster_object in cluster_objects:
+        '''
         asset = cluster_object.asset
         segment = cluster_object.segment
         d = json.loads(asset.data)
         d['uuid'] = str(cluster_object.uuid)
         d['asset_uuid'] = str(asset.uuid)
         d['segment_uuid'] = str(segment.uuid)
-        cluster_list.append(d)
+        '''
+        cluster_list.append(cluster_object.data())
       response_body = json.dumps(cluster_list, indent=2)
       return HttpResponse(response_body, content_type='application/json')
     
@@ -115,10 +117,6 @@ class ClusterApi:
 
   @classmethod
   def update_status(cls, request):
-    @background(queue='queue_name1', schedule=0)
-    def some_long_duration_process(some_param1, some_param2):
-      print('hello world')
-
     return HttpResponse('{"status":"ok"}')
 
   @classmethod

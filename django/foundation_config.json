@@ -146,8 +146,10 @@
     {
       "name" : "main",
       "description" : "10.149.<POC>.0 cluster at main segment 10.149.0.0/17",
-      "foundation_vm" : {
-        "ip_address" : "10.149.0.5",
+      "foundation_vms" : {
+          "ip_addresses" : [
+            "10.149.0.5"
+          ],
         "user" : "nutanix",
         "password" : "nutanix/4u",
         "nos_packages" : {
@@ -215,14 +217,16 @@
     {
       "name" : "training01",
       "description" : "10.149.160.0 cluster at training segment 10.149.160.0/22",
-      "foundation_vm" : {
-        "ip_address" : "10.149.160.5",
-        "user" : "nutanix",
-        "password" : "nutanix/4u",
-        "nos_packages" : {
-          "5.5.7" : "nutanix_installer_package-release-euphrates-5.5.7-stable.tar",
-          "5.10.1" : "nutanix_installer_package-release-euphrates-5.10.1-stable.tar"
-        }
+      "foundation_vms" : {
+          "ip_addresses" : [
+            "10.149.160.5"
+          ],
+          "user" : "nutanix",
+          "password" : "nutanix/4u",
+          "nos_packages" : {
+            "5.5.7" : "nutanix_installer_package-release-euphrates-5.5.7-stable.tar",
+            "5.10.1" : "nutanix_installer_package-release-euphrates-5.10.1-stable.tar"
+          }
       },
       "basics":{
         "language" : "ja-JP",
@@ -306,8 +310,10 @@
     {
       "name" : "training02",
       "description" : "10.149.161.0 cluster at training segment 10.149.160.0/22",
-      "foundation_vm" : {
-        "ip_address" : "10.149.160.5",
+      "foundation_vms" : {
+          "ip_addresses" : [
+            "10.149.160.5"
+          ],
         "user" : "nutanix",
         "password" : "nutanix/4u",
         "nos_packages" : {

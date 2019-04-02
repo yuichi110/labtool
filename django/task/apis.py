@@ -2,16 +2,15 @@ from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest, Http
 from django.core.serializers import serialize
 
 from rest_framework import generics
-from .models import Asset
 
 from background_task import background
 from uuid import UUID
 import json
 
-class AssetApi:
+class TaskApi:
 
   @classmethod
-  def assets(cls, request):
+  def tasks(cls, request):
     def get(request):
       asset_objects = Asset.objects.all()
       asset_list = [json.loads(asset_object.data) for asset_object in asset_objects]
@@ -37,7 +36,7 @@ class AssetApi:
       return HttpResponseBadRequest(response_body, content_type='application/json')
 
   @classmethod
-  def asset(cls, request, uuid):
+  def task(cls, request, uuid):
     def get(request, uuid):
       asset_object = Asset.objects.filter(uuid=uuid)[0]
       response_body = asset_object.data
