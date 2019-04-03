@@ -4,6 +4,11 @@ from django.core.exceptions import ValidationError
 import uuid
 import json
 
+class FoundationVM(models.Model):
+  ip_address = models.CharField(primary_key=True, max_length=100)
+  user = models.CharField(max_length=100)
+  password = models.CharField(max_length=100)
+
 class Segment(models.Model):
   uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   name = models.CharField(max_length=100, unique=True)

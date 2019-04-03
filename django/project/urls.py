@@ -18,11 +18,16 @@ urlpatterns = [
     path('api/segments/', SegmentApi.segments),
     path('api/segments/<str:uuid>', SegmentApi.segment),
 
+    path('api/foundationvms', SegmentApi.foundationvms),
+    path('api/foundationvms/', SegmentApi.foundationvms),
+    path('api/foundationvms/<str:segment_uuid>', SegmentApi.foundationvm),
+
     path('api/clusters', ClusterApi.clusters),
     path('api/clusters/', ClusterApi.clusters),
     path('api/clusters/<str:uuid>', ClusterApi.cluster),
 
-    path('api/operation/foundation/<str:uuid>', OperationApi.foundation),
+    path('api/operations/foundation', OperationApi.foundation),
+    path('api/operations/foundation/', OperationApi.foundation),
 
     path('api/tasks', TaskApi.tasks),
     path('api/tasks/', TaskApi.tasks),

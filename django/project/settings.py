@@ -41,12 +41,14 @@ INSTALLED_APPS = [
     # 3rd party
     #'rest_framework',
     #'corsheaders',
-    'background_task',
+    #'background_task',
 
     # my apps
     'asset',
     'segment',
     'cluster',
+    'operation',
+    'task'
 ]
 
 MIDDLEWARE = [

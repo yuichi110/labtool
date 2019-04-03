@@ -10,6 +10,49 @@ import json
 class SegmentApi:
 
   @classmethod
+  def foundationvms(cls, request):
+    if request.method != 'GET':
+      response_body = json.dumps({'error':"unsupported method : '{}'".format(request.method)}, indent=2)
+      return HttpResponseBadRequest(response_body, content_type='application/json')
+
+    foundationvm_map = {}
+    segment_objects = Segment.objects.all()
+    for segment_object in segment_objects:
+      d = json.loads(segment_object.data)['foundation_vms']
+      segment_uuid = str(segment_object.uuid)
+      d['segment_uuid'] = segment_uuid
+      d['segment_name'] = segment_object.name
+      foundationvm_map[segment_uuid] = d
+
+    response_body = json.dumps(foundationvm_map, indent=2)
+    return HttpResponse(response_body, content_type='application/json')
+
+  @classmethod
+  def foundationvm(cls, request, segment_uuid):
+    if request.method != 'GET':
+      response_body = json.dumps({'error':"unsupported method : '{}'".format(request.method)}, indent=2)
+      return HttpResponseBadRequest(response_body, content_type='application/json')
+
+    try:
+      UUID(segment_uuid, version=4)
+    except:
+      response_body = json.dumps({'error':"incorrect uuid format"}, indent=2)
+      return HttpResponseBadRequest(response_body, content_type='application/json')
+    segment_objects = Segment.objects.filter(uuid=segment_uuid)
+    if len(segment_objects) == 0:
+      response_body = json.dumps({'error':'object not found'.format(request.method)}, indent=2)
+      return HttpResponseNotFound(response_body, content_type='application/json')
+
+    segment_object = segment_objects[0]
+    d = json.loads(segment_object.data)['foundation_vms']
+    segment_uuid = str(segment_object.uuid)
+    d['segment_uuid'] = segment_uuid
+    d['segment_name'] = segment_object.name
+
+    response_body = json.dumps(d, indent=2)
+    return HttpResponse(response_body, content_type='application/json')
+
+  @classmethod
   def segments(cls, request):
     def get(request):
       segment_objects = Segment.objects.all()

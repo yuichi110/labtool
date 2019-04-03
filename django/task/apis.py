@@ -6,55 +6,29 @@ from rest_framework import generics
 from background_task import background
 from uuid import UUID
 import json
+from .models import Task
 
 class TaskApi:
 
   @classmethod
   def tasks(cls, request):
-    def get(request):
-      asset_objects = Asset.objects.all()
-      asset_list = [json.loads(asset_object.data) for asset_object in asset_objects]
-      response_body = json.dumps(asset_list, indent=2)
-      return HttpResponse(response_body, content_type='application/json')
-    
-    def post(request):
-      try:
-        json_text = request.body.decode()
-        data = Asset.create(json_text)
-      except Exception as e:
-        print(e)
-        response_body = json.dumps({'error':"request body has problem"}, indent=2)
-        return HttpResponseBadRequest(response_body, content_type='application/json')
-      return HttpResponse(data, content_type='application/json')
-
-    if request.method == 'GET':
-      return get(request)
-    elif request.method == 'POST':
-      return post(request)
-    else:
+    if request.method != 'GET':
       response_body = json.dumps({'error':"unsupported method : '{}'".format(request.method)}, indent=2)
       return HttpResponseBadRequest(response_body, content_type='application/json')
 
+    task_objects = Task.objects.all()
+    task_list = [task_object.get_dict() for task_object in task_objects]
+    response_body = json.dumps(task_list, indent=2)
+    return HttpResponse(response_body, content_type='application/json')
+
   @classmethod
   def task(cls, request, uuid):
-    def get(request, uuid):
-      asset_object = Asset.objects.filter(uuid=uuid)[0]
-      response_body = asset_object.data
+    def get(request, task_object):
+      response_body = json.dumps(task_object.get_dict(), indent=2)
       return HttpResponse(response_body, content_type='application/json')
-
-    def put(request, uuid):
-      try:
-        json_text = request.body.decode()
-        Asset.update(uuid, json_text)
-      except Exception as e:
-        print(e)
-        response_body = json.dumps({'error':"request body has problem"}, indent=2)
-        return HttpResponseBadRequest(response_body, content_type='application/json')
-      return HttpResponse(asset_object.data, content_type='application/json')
     
-    def delete(request, uuid):
-      asset_object = Asset.objects.filter(uuid=uuid)[0]
-      asset_object.delete()
+    def delete(request, task_object):
+      task_object.delete()
       return HttpResponse('{}', content_type='application/json')
 
     # validation
@@ -63,16 +37,15 @@ class TaskApi:
     except:
       response_body = json.dumps({'error':"incorrect uuid format"}, indent=2)
       return HttpResponseBadRequest(response_body, content_type='application/json')
-    if len(Asset.objects.filter(uuid=uuid)) == 0:
+    task_objects = Task.objects.filter(uuid=uuid)
+    if len(task_objects) == 0:
       response_body = json.dumps({'error':'object not found'}, indent=2)
       return HttpResponseNotFound(response_body, content_type='application/json')
 
     if request.method == 'GET':
-      return get(request, uuid)
-    elif request.method == 'PUT':
-      return put(request, uuid)
+      return get(request, task_objects[0])
     elif request.method == 'DELETE':
-      return delete(request, uuid)
+      return delete(request, task_objects[0])
     else:
       response_body = json.dumps({'error':"unsupported method : '{}'".format(request.method)}, indent=2)
       return HttpResponseBadRequest(response_body, content_type='application/json')
