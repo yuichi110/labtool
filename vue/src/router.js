@@ -11,5 +11,20 @@ export default new Router({
       name: 'IndexView',
       component: IndexView,
     },
+    {
+      path: '/clusters',
+      name: 'ClusterView',
+      component: IndexView,
+    },
+    {
+      path: '/assets',
+      name: 'AssetView',
+      component: IndexView,
+    },
+    {
+      path: '/segments',
+      name: 'SegmentView',
+      component: IndexView,
+    },
   ]
 })
