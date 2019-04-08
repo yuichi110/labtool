@@ -1,0 +1,30 @@
+(1) install
+brew install node
+npm install -g @vue/cli
+npm install axios
+npm install element-ui
+
+
+(2) create project
+vue create vue
+
+Vue CLI v3.5.5
+? Please pick a preset: Manually select features
+? Check the features needed for your project: Babel, Router, Linter
+? Use history mode for router? (Requires proper server setup for index fallback in production) No
+? Pick a linter / formatter config: Basic
+? Pick additional lint features: (Press <space> to select, <a> to toggle all, <i> to invert selection)Lint on save
+? Where do you prefer placing config for Babel, PostCSS, ESLint, etc.? In package.json
+? Save this as a preset for future projects? No
+
+
+(3) element
+cd vue
+vue add element
+
+
+(4) start
+$ cd vue
+$ npm run serve
+
+(4) Install Vue JS Syntax highlight package to Sublime

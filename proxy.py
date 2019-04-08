@@ -229,6 +229,6 @@ def _get_HTTPServer_instance(ip, port, proxy_rule):
 
 
 if __name__ == '__main__':
-  httpd = get_proxy_instance(LISTEN_IP, LISTEN_PORT, PROXY_RULE)
+  httpd = get_HTTPServer_instance(LISTEN_IP, LISTEN_PORT, PROXY_RULE)
   print('Python http proxy is running at {}:{}'.format(LISTEN_IP, LISTEN_PORT))
   httpd.serve_forever()

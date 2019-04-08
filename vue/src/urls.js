@@ -1,4 +1,4 @@
 export default {
-  CLUSTER : '/api/cluster',
-  CLUSTER_ID : '/api/cluster/{}'
+  CLUSTER : '/api/clusters/',
+  CLUSTER_ID : '/api/clusters/{}'
 }

@@ -17,11 +17,11 @@ sleep 5;
 
 # start node(vue)
 echo
-echo "(2) Starting Node(Frontend) at port 8080"
+echo "(2) Starting Vue-JS(Node,Frontend) at port 8080"
 echo
 { 
   cd vue
-  npm start
+  npm run serve
 } &
 sleep 10;
 
