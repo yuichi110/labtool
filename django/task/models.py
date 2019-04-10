@@ -17,7 +17,7 @@ class Task(models.Model):
       'name':self.name,
       'data':json.loads(self.data),
       'is_complete':self.is_complete,
-      'creation_time':self.creation_time,
-      'update_time':self.update_time
+      'creation_time':str(self.creation_time),
+      'update_time':str(self.update_time)
     }
     return d

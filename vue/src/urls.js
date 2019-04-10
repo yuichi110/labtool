@@ -1,13 +1,13 @@
 export default {
   CLUSTER : '/api/clusters/',
-  CLUSTER_ID : '/api/clusters/{}',
+  CLUSTER_UUID : '/api/clusters/{}',
 
   ASSET : '/api/assets/',
-  ASSET_ID : '/api/assets/{}',
+  ASSET_UUID : '/api/assets/{}',
 
   SEGMENT : '/api/segments/',
-  SEGMENT_ID : '/api/segments/{}',
+  SEGMENT_UUID : '/api/segments/{}',
 
   TASK : '/api/tasks/',
-  TASK_ID : '/api/tasks/{}'
+  TASK_UUID : '/api/tasks/{}'
 }

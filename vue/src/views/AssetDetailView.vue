@@ -15,7 +15,7 @@ import HeaderModule from '@/components/HeaderModule'
 import FooterModule from '@/components/FooterModule'
 
 export default {
-  name: 'TaskListView',
+  name: 'IndexView',
   components: {
     HeaderModule,
     FooterModule,

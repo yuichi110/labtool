@@ -71,7 +71,7 @@ class ClusterApi:
   def cluster(cls, request, uuid):
     def get(request, uuid):
       cluster_object = Cluster.objects.filter(uuid=uuid)[0]
-      response_body = json.dumps(Cluster.object2dict(cluster_object), indent=2)
+      response_body = json.dumps(cluster_object.data(), indent=2)
       return HttpResponse(response_body, content_type='application/json')
 
     def put(request, uuid):

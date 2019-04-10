@@ -11,7 +11,7 @@
           <router-link :to="{name:'ClusterListView'}">Clusters</router-link>
         </template>
         <el-menu-item v-for="(cluster, key, index) in clusters" :key="index" index="2-1">
-          <router-link :to="{name:'ClusterDetailView', params:{id: cluster.id }}">{{ cluster.name }}</router-link>
+          <router-link :to="{name:'ClusterDetailView', params:{uuid: cluster.uuid }}">{{ cluster.name }}</router-link>
         </el-menu-item>
       </el-submenu>
 
@@ -20,7 +20,7 @@
           <router-link :to="{name:'AssetListView'}">Assets</router-link>
         </template>
         <el-menu-item v-for="(asset, key, index) in assets" :key="index" index="3-1">
-          <router-link :to="{name:'AssetDetailView', params:{id: asset.id }}">{{ asset.name }}</router-link>
+          <router-link :to="{name:'AssetDetailView', params:{uuid: asset.uuid }}">{{ asset.name }}</router-link>
         </el-menu-item>
       </el-submenu>
       
@@ -29,7 +29,7 @@
           <router-link :to="{name:'SegmentListView'}">Segments</router-link>
         </template>
         <el-menu-item v-for="(segment, key, index) in segments" :key="index" index="4-1">
-          <router-link :to="{name:'SegmentDetailView', params:{id: segment.id }}">{{ segment.name }}</router-link>
+          <router-link :to="{name:'SegmentDetailView', params:{uuid: segment.uuid }}">{{ segment.name }}</router-link>
         </el-menu-item>
       </el-submenu>
 
@@ -37,8 +37,8 @@
         <template slot="title">
           <router-link :to="{name:'TaskListView'}">Tasks</router-link>
         </template>
-        <el-menu-item v-for="(segment, key, index) in tasks" :key="index" index="4-1">
-          <router-link :to="{name:'TaskDetailView', params:{id: task.id }}">{{ task.name }}</router-link>
+        <el-menu-item v-for="(task, key, index) in tasks" :key="index" index="4-1">
+          <router-link :to="{name:'TaskDetailView', params:{uuid: task.uuid }}">{{ task.name }}</router-link>
         </el-menu-item>
       </el-submenu>
 
