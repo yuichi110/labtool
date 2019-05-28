@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 
+from cluster.views import IndexView
 from asset.apis import AssetApi
 from segment.apis import SegmentApi
 from cluster.apis import ClusterApi
@@ -8,6 +9,8 @@ from operation.apis import OperationApi
 from task.apis import TaskApi
 
 urlpatterns = [
+    path('', IndexView.as_view(), name='home'),
+
     path('admin/', admin.site.urls),
 
     path('api/assets', AssetApi.assets),

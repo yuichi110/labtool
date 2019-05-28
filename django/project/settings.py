@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'segment',
     'cluster',
     'operation',
-    'task'
+    'task',
+    'static'
 ]
 
 MIDDLEWARE = [
@@ -132,7 +133,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR,
+]
+
+STATIC_URL = '/view/'
 
 CORS_ORIGIN_WHITELIST = [
     '127.0.0.1:8080',

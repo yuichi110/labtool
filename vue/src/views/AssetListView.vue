@@ -1,75 +1,59 @@
 <template>
-  <div>
-    <HeaderModule/>
+<div>
+  <b-container>
 
-    <h1>Assets</h1>
+    <div 
+      v-for="asset in $store.state.assets"
+      :key="asset.uuid"
+      style="padding-bottom: 50px; text-align: left"
+    >
+      <h2>{{ asset.name }}</h2>
+      <p>Prism User: {{ asset.prism_user }}</p>
+      <p>Prism Password: {{ asset.prism_password }}</p>
+      <p>Prism External IP: {{ asset.external_ip }}</p>
+      <table 
+        class="table table-borderless" 
+        style="margin-top: auto; margin-bottom: auto;"
+      >
+        <thead>
+          <tr>
+            <th scope="col">Host</th>
+            <th scope="col">Position</th>
+            <th scope="col">IPMI MAC</th>
+            <th scope="col">IPMI IP</th>
+            <th scope="col">Host IP</th>
+            <th scope="col">CVM IP</th>
+          </tr>
+        </thead>
 
-  <el-table
-    :data="assets"
-    style="width: 100%">
-    <el-table-column
-      label="Name"
-      width="100">
-      <template slot-scope="scope">
-        <el-popover trigger="hover" placement="top">
-          <p>Name: {{ scope.row.name }}</p>
-          <p>UUID: {{ scope.row.uuid }}</p>
-          <div slot="reference" class="name-wrapper">
-            <el-tag size="medium">{{ scope.row.name }}</el-tag>
-          </div>
-        </el-popover>
-      </template>
-    </el-table-column>
+        <tbody>
+          <tr 
+            v-for="node in asset.nodes"
+            :key="node.ipmi_mac"
+          >
+            <td>{{ node.host_name }}</td>
+            <td>{{ node.position }}</td>  
+            <td>{{ node.ipmi_mac }}</td>
+            <td>{{ node.ipmi_ip }}</td>
+            <td>{{ node.host_ip }}</td>  
+            <td>{{ node.cvm_ip }}</td>       
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-    <el-table-column
-      label="ID"
-      width="100">
-      <template slot-scope="scope">
-        <el-popover trigger="hover" placement="top">
-          <p>Name: {{ scope.row.name }}</p>
-          <p>UUID: {{ scope.row.uuid }}</p>
-          <div slot="reference" class="name-wrapper">
-            <el-tag size="medium">{{ scope.row.POCID }}</el-tag>
-          </div>
-        </el-popover>
-      </template>
-    </el-table-column>
+  </b-container>
 
-
-    <el-table-column
-      label="Operations">
-      <template slot-scope="scope">
-        <el-button
-          size="mini"
-          @click="handleDetail(scope.row.uuid)">Detail</el-button>
-        <el-button
-          size="mini"
-          @click="handleEdit(scope.row.uuid)">Edit</el-button>
-        <el-button
-          size="mini"
-          type="danger"
-          @click="handleDelete(scope.row.uuid)">Delete</el-button>
-      </template>
-    </el-table-column>
-  </el-table>
-
-    <FooterModule/>
-  </div>
+</div>
 </template>
 
 <script>
-import axios from 'axios'
-import urls from '@/urls'
-import '@/utils'
 
-import HeaderModule from '@/components/HeaderModule'
-import FooterModule from '@/components/FooterModule'
 
 export default {
   name: 'AssetListView',
   components: {
-    HeaderModule,
-    FooterModule,
+
   },
 
   data () {
@@ -79,28 +63,11 @@ export default {
   },
 
   methods: {
-    getAssets: function(){
-      return axios.get(urls.ASSET)
-      .then((response) => {
-        console.log(response.data)
-        this.assets = response.data
-      })
-      .catch((error) => {
-        console.log('Error. Failed to get response from "' + urls.CLUSTER + '"')
-      })
-    },
 
-    handleEdit(cluster_uuid) {
-      console.log(cluster_uuid);
-    },
-    handleDelete(cluster_uuid) {
-      console.log(cluster_uuid);
-    }
   },
 
   created(){
-    this.getAssets()
-    //this.timer = setInterval(this.getClusters, 10 * 1000)
+
   }
 }
 </script>

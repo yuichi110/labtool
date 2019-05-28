@@ -26,9 +26,10 @@ Please check "call_proxy_sample.py" for details.
 LISTEN_IP = '127.0.0.1'
 LISTEN_PORT = 80
 PROXY_RULE = [
-  ('127.0.0.1', 8000, ['/api', '/admin', 'static/admin']), 
+  ('127.0.0.1', 8000, ['/api', '/root/admin', '/static/admin']), 
   ('127.0.0.1', 8080, ['.*']),
 ]
+NUM_THREDS = 100
 
 
 # PUBLIC FUNCTION FOR (2)
@@ -36,10 +37,8 @@ def get_HTTPServer_instance(ip, port, proxy_rule):
   # raise Exception if parameters have problem.
   return _get_HTTPServer_instance(ip, port, proxy_rule)
 
-
-
-import re
-import sys
+import time, re, sys, threading, socket
+threading, socket
 if sys.version_info.major == 3:
   from http.server import BaseHTTPRequestHandler, HTTPServer
   from urllib.request import HTTPErrorProcessor, Request, build_opener
@@ -111,12 +110,12 @@ class _ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
     else:
       req = RequestWithMethod(method=method, url=url, headers=header_dict, data=body)
 
-    # Build opener which avoid URL redirection.
-    opener = build_opener(_NoRedirectProcessor)
-
-    # Access to the upstream server and get response.
     try:
-      resp = opener.open(req)
+      # Build opener which avoid URL redirection.
+      opener = build_opener(_NoRedirectProcessor)
+
+      # Access to the upstream server and get response.
+      resp = opener.open(req, timeout=10)
     except HTTPError as e:
       if e.getcode():
         resp = e
@@ -133,22 +132,25 @@ class _ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
       self.end_headers()
       return      
 
-    # Set response code.
-    self.send_response(resp.getcode())
+    try:
+      # Set response code.
+      self.send_response(resp.getcode())
 
-    # Set response header.
-    if sys.version_info.major == 3:
-      headers = resp.info().as_string().splitlines()
-    else:
-      headers = resp.info().headers
-    for line in headers:
-      line_parts = line.split(':', 1)
-      if len(line_parts) == 2:
-        self.send_header(line_parts[0].strip(), line_parts[1].strip())
-    self.end_headers()
+      # Set response header.
+      if sys.version_info.major == 3:
+        headers = resp.info().as_string().splitlines()
+      else:
+        headers = resp.info().headers
+      for line in headers:
+        line_parts = line.split(':', 1)
+        if len(line_parts) == 2:
+          self.send_header(line_parts[0].strip(), line_parts[1].strip())
+      self.end_headers()
 
-    # Set response body.
-    self.wfile.write(resp.read())
+      # Set response body.
+      self.wfile.write(resp.read())
+    except Exception as e:
+      print(e)
 
     # Done.
     return
@@ -172,8 +174,8 @@ class _ProxyHTTPRequestHandler(BaseHTTPRequestHandler):
     self.proxy('OPTIONS')
 
 
-def _get_HTTPServer_instance(ip, port, proxy_rule):
-  import socket
+def start_proxy(ip, port, proxy_rule, num_threds=100):
+
   def is_ip_ok(ip):
     try:
       socket.inet_aton(ip)
@@ -218,17 +220,35 @@ def _get_HTTPServer_instance(ip, port, proxy_rule):
         raise Exception('Illegal Regex pattern "{}" is in proxy_rule'.format(urlpat))
 
   # All params are OK. 
-  # Create handler with proxy rule
+  # Create shared socket and http-handler with proxy rule
+
+  addr = (ip, port)
+  sock = socket.socket (socket.AF_INET, socket.SOCK_STREAM)
+  sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+  sock.bind(addr)
+  sock.listen(5)
+
   def handler(*args):
     return _ProxyHTTPRequestHandler(proxy_rule, *args)
 
-  # Build HTTP Server
-  httpd = HTTPServer((ip, port), handler)
+  class Thread(threading.Thread):
+    def __init__(self, i):
+      threading.Thread.__init__(self)
+      self.i = i
+      self.daemon = True
+      self.start()
+    def run(self):
+      httpd = HTTPServer(addr, handler, False)
+      # Prevent the HTTP server from re-binding every handler.
+      # https://stackoverflow.com/questions/46210672/
+      httpd.socket = sock
+      httpd.server_bind = self.server_close = lambda self: None
+      httpd.serve_forever()
 
-  return httpd
+  [Thread(i) for i in range(num_threds)]
+  while True:
+    time.sleep(1)
 
 
 if __name__ == '__main__':
-  httpd = get_HTTPServer_instance(LISTEN_IP, LISTEN_PORT, PROXY_RULE)
-  print('Python http proxy is running at {}:{}'.format(LISTEN_IP, LISTEN_PORT))
-  httpd.serve_forever()
+  start_proxy(LISTEN_IP, LISTEN_PORT, PROXY_RULE, NUM_THREDS)

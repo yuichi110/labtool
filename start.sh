@@ -1,5 +1,9 @@
 #!/usr/bin/env bash 
 
+# development
+# local
+# heroku
+
 # get password
 printf "password: "
 read -s password
@@ -35,28 +39,28 @@ echo
 
 ctrc()
 {
-  # kill proxy with sudo
+  # kill proxy
   {
-    pid_port80=`echo "$password" | sudo -S lsof -ti tcp:80`
-    if [ $pid_port80 ]; then
-      echo "$password" | sudo -S kill -9 $pid_port80
-    fi
+    pids_port80=`echo "$password" | sudo -S lsof -ti tcp:80`
+    for pid in $pids_port80 ; do
+      echo "$password" | sudo -S kill -9 $pid
+    done
   } &
 
   # kill node(vue)
   {
-    pid_port8000=`lsof -ti tcp:8000`
-    if [ $pid_port8000 ]; then
-      kill -9 $pid_port8000
-    fi
+    pids_port8000=`lsof -ti tcp:8000`
+    for pid in $pids_port8000 ; do
+      kill -9 $pid
+    done
   } &
 
   # kill django
   {
-    pid_port8080=`lsof -ti tcp:8080`
-    if [ $pid_port8080 ]; then
-      kill -9 $pid_port8080
-    fi
+    pids_port8080=`lsof -ti tcp:8080`
+    for pid in $pids_port8000 ; do
+      kill -9 $pid
+    done
   } &
 
   wait

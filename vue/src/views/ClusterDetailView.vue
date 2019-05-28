@@ -1,26 +1,22 @@
 <template>
   <div>
+    <!--
     <HeaderModule/>
 
     <h1>Cluster {{ name }}</h1>
 
     <FooterModule/>
+  -->
   </div>
 </template>
 
 <script>
-import axios from 'axios'
-import urls from '@/urls'
-import '@/utils'
 
-import HeaderModule from '@/components/HeaderModule'
-import FooterModule from '@/components/FooterModule'
 
 export default {
   name: 'ClusterDetailView',
   components: {
-    HeaderModule,
-    FooterModule,
+
   },
 
   data () {

@@ -7,8 +7,6 @@ import AssetListView from '@/views/AssetListView'
 import AssetDetailView from '@/views/AssetDetailView'
 import SegmentListView from '@/views/SegmentListView'
 import SegmentDetailView from '@/views/SegmentDetailView'
-import TaskListView from '@/views/TaskListView'
-import TaskDetailView from '@/views/TaskDetailView'
 
 Vue.use(Router)
 
@@ -52,16 +50,5 @@ export default new Router({
       name: 'SegmentDetailView',
       component: SegmentDetailView,
     },
-
-    {
-      path: '/tasks',
-      name: 'TaskListView',
-      component: TaskListView,
-    },
-    {
-      path: '/tasks/:uuid',
-      name: 'TaskDetailView',
-      component: TaskDetailView,
-    },  
   ]
 })

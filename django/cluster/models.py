@@ -13,6 +13,7 @@ class Cluster(models.Model):
   uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   asset = models.OneToOneField(Asset, on_delete=models.CASCADE, editable=False)
   segment = models.ForeignKey(Segment, on_delete=models.CASCADE)
+  #status = models.TextField()
 
   def __str__(self):
     return 'Asset:{}, Segment:{}, UUID:{}'.format(self.asset.name, self.segment.name, self.uuid)
@@ -44,3 +45,22 @@ class Cluster(models.Model):
     cluster_dict['segment_name'] = self.segment.name
     
     return cluster_dict
+
+  def update_status(self):
+    cluster_dict = self.data()
+    uuid = cluster_dict['uuid']
+    ipmi_macs = []
+    host_ips = []
+    for node in nodes:
+      ipmi_macs.append(node['ipmi_mac'])
+      host_ips.append(node['host_ip'])
+
+    fvm_user = ''
+    fvm_password = ''
+    fvm_ip = ''
+
+    prism_user = cluster_dict['prism_user']
+    prism_password = cluster_dict['prism_password']
+    prism_ip = cluster_dict['external_ip']
+
+    # check status

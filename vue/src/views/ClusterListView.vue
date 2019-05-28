@@ -1,168 +1,159 @@
 <template>
-  <div>
-    <HeaderModule/>
+<div>
+  <b-container>
     <h1>Clusters</h1>
 
-  <el-table
-    :data="clusters"
-    style="width: 100%">
-    <el-table-column
-      label="Cluster"
-      width="100">
-      <template slot-scope="scope">
-        <el-popover trigger="hover" placement="top">
-          <p>Name: {{ scope.row.name }}</p>
-          <p>UUID: {{ scope.row.uuid }}</p>
-          <div slot="reference" class="name-wrapper">
-            <el-tag size="medium">{{ scope.row.name }}</el-tag>
-          </div>
-        </el-popover>
-      </template>
-    </el-table-column>
-    <el-table-column
-      label="Asset"
-      width="100">
-      <template slot-scope="scope">
-        <el-popover trigger="hover" placement="top">
-          <p>Name: {{ scope.row.asset_name }}</p>
-          <p>UUID: {{ scope.row.asset_uuid }}</p>
-          <div slot="reference" class="name-wrapper">
-            <el-tag size="medium">{{ scope.row.asset_name }}</el-tag>
-          </div>
-        </el-popover>
-      </template>
-    </el-table-column>
-    <el-table-column
-      label="Segment"
-      width="100">
-      <template slot-scope="scope">
-        <el-popover trigger="hover" placement="top">
-          <p>Name: {{ scope.row.segment_name }}</p>
-          <p>UUID: {{ scope.row.segment_uuid }}</p>
-          <div slot="reference" class="name-wrapper">
-            <el-tag size="medium">{{ scope.row.segment_name }}</el-tag>
-          </div>
-        </el-popover>
-      </template>
-    </el-table-column>
 
-    <el-table-column
-      label="Foundation">
-      <template slot-scope="scope">
-        <el-select v-model="scope.row.value_aos" placeholder="AOS">
-          <el-option
-            v-for="(value, key) in scope.row.foundation_vms.nos_packages"
-            :key="value"
-            :label="key"
-            :value="value">
-          </el-option>
-        </el-select>
-        <el-select v-model="scope.row.value_hypervisor" placeholder="Hypervisor">
-          <el-option
-            v-for="(value, key) in hypervisor"
-            :key="value"
-            :label="key"
-            :value="value">
-          </el-option>
-        </el-select>
-        <el-button
-          size="mini"
-          type="primary"
-          @click="handleFoundation(scope.row.uuid, scope.row.value_aos, scope.row.value_hypervisor)">Foundation</el-button>
-      </template>
-    </el-table-column>
+    <table class="table table-borderless" style="margin-top: auto; margin-bottom: auto;">
+      <thead>
+        <tr>
+          <th scope="col">Cluster</th>
+          <th scope="col">Segment</th>
+          <th scope="col">Physically Exist</th>
+          <th scope="col">Host Reachable</th>
+          <th scope="col">Cluster Up</th>
+          <th scope="col">AOS Version</th>
+          <th scope="col">Hypervisor</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
 
-    <el-table-column
-      label="Operations">
-      <template slot-scope="scope">
-        <el-button
-          size="mini"
-          @click="handleDetail(scope.row.uuid)">Detail</el-button>
-        <el-button
-          size="mini"
-          @click="handleEdit(scope.row.uuid)">Edit</el-button>
-        <el-button
-          size="mini"
-          type="danger"
-          @click="handleDelete(scope.row.uuid)">Delete</el-button>
-      </template>
-    </el-table-column>
-  </el-table>
+      <tbody>
+        <tr 
+          v-for="cluster in $store.state.clusters"
+          :key="cluster.uuid"
+        >
+          <td>{{ cluster.name }}</td>
+          <td>{{ cluster.segment_name }}</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td>
+            <a style="color: blue; cursor: pointer;" @click="() => { start_clicked(cluster.uuid) }">Start</a>
+            <a style="color: red; cursor: pointer; margin-left: 20px" @click="() => { stop_clicked(cluster.uuid) }">Stop</a>
+            <a style="color: red; cursor: pointer; margin-left: 20px" @click="() => { foundation_clicked(cluster.uuid) }">Foundation</a>
+          </td>          
+        </tr>
+      </tbody>
+    </table>
 
-    <FooterModule/>
-  </div>
+  </b-container>
+
+  <b-modal id="cluster-stop-modal" title="Cluster Stop" >
+    <b-container>
+      Cluster Stop
+    </b-container>
+  </b-modal>
+
+  <b-modal id="cluster-foundation-modal" title="Cluster Foundation" hide-footer>
+    <b-container>
+      <b-form-group
+        label="AOS Version"
+        label-cols="4"
+        label-for="input-horizontal"
+      >
+        <b-form-select v-model="selected_aos_version" :options="aos_versions"></b-form-select>
+      </b-form-group>
+
+      <b-form-group
+        label="Hypervisor"
+        label-cols="4"
+        label-for="input-horizontal"
+      >
+        <b-form-select v-model="selected_hypervisor" :options="hypervisors"></b-form-select>
+      </b-form-group>
+
+      <div slot="modal-footer" class="w-100">
+        <b-button block variant="danger" 
+          :disabled="foundationDisabled"
+          @click="() => { start_foundation() }"
+        >Start Foundation</b-button>
+      </div>
+
+    </b-container>
+  </b-modal>
+
+</div>
 </template>
 
 <script>
 import axios from 'axios'
-import urls from '@/urls'
-import '@/utils'
-
-import HeaderModule from '@/components/HeaderModule'
-import FooterModule from '@/components/FooterModule'
 
 export default {
   name: 'ClusterListView',
   components: {
-    HeaderModule,
-    FooterModule,
+
   },
 
   data () {
     return {
-      clusters: [],
-      hypervisor: {
-        'AHV (AOS Bundled)':'ahv',
-        'ESXi 6.5':'esxi:esxi.iso'
+      selected_cluster: null,
+
+      selected_aos_version: null,
+      aos_versions: [],
+
+      selected_hypervisor: null,
+      hypervisors: [],
+    }
+  },
+
+  computed: {
+    foundationDisabled: function(){
+      if(this.selected_aos_version == null){
+        return true
       }
+      if(this.selected_hypervisor == null){
+        return true
+      }
+      return false
     }
   },
 
   methods: {
-    getClusters: function(){
-      return axios.get(urls.CLUSTER)
-      .then((response) => {
-        let clusters = response.data
-        for(let cluster of clusters){
-          cluster['value_aos'] = ''
-          cluster['value_hypervisor'] = ''
+    stop_clicked: function(uuid){
+      this.selected_cluster = uuid
+
+      this.$bvModal.show('cluster-stop-modal')
+    },
+
+    foundation_clicked: function(uuid){
+      this.selected_cluster = uuid
+
+      this.selected_aos_version = null
+      for(let cluster of this.$store.state.clusters){
+        if(cluster.uuid != uuid){
+          continue
         }
-        this.clusters = clusters
-      })
-      .catch((error) => {
-        console.log('Error. Failed to get response from "' + urls.CLUSTER + '"')
-      })
-    },
-
-    handleDetail(cluster_uuid) {
-      console.log(cluster_uuid);
-    },
-    handleEdit(cluster_uuid) {
-      console.log(cluster_uuid);
-    },
-    handleFoundation(cluster_uuid, value_aos, value_hypervisor) {
-      console.log(value_aos)
-      console.log(value_hypervisor)
-      if(value_aos == ''){
-        return
-      }
-      if(value_hypervisor == ''){
-        return
+        let aos_versions = []
+        for(let key in cluster.foundation_vms.nos_packages){
+          let value = cluster.foundation_vms.nos_packages[key]
+          aos_versions.push({
+            value:value,
+            text:key
+          })
+        }
+        this.aos_versions = aos_versions
+        break
       }
 
-      let hypervisor_type = 'ahv'
-      let hypervisor_image = ''
-      if(value_hypervisor != 'ahv'){
-        words = value_hypervisor.split(':')
-        hypervisor_type = $.trim(words[0])
-        hypervisor_image = $.trim(words[1])
-      }
+      this.selected_hypervisor = null
+      this.hypervisors = [{value:'ahv', text:'AHV'}]
+
+      this.$bvModal.show('cluster-foundation-modal')
+    },
+
+    start_foundation: function(){
+      console.log(this.selected_cluster)
+      console.log(this.selected_aos_version)
+      console.log(this.selected_hypervisor)
 
       axios.post('/api/operations/foundation', {
-        cluster_uuid: cluster_uuid,
-        aos_image: value_aos,
-        hypervisor_type: hypervisor_type,
-        hypervisor_image: hypervisor_image
+        cluster_uuid: this.selected_cluster,
+        aos_image: this.selected_aos_version,
+        hypervisor_type: 'ahv',
+        hypervisor_image: ''
       })
       .then((response) => {
         console.log(response)
@@ -170,14 +161,11 @@ export default {
       .catch((error) => {
         console.log(error)
       })
-    },
-    handleDelete(cluster_uuid) {
-      console.log(cluster_uuid);
     }
   },
 
   created(){
-    this.getClusters()
+    //this.getClusters()
     //this.timer = setInterval(this.getClusters, 10 * 1000)
   }
 }

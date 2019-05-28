@@ -1,24 +1,51 @@
 <template>
-  <div>
-    <HeaderModule/>
+<div>
+  <b-container>
 
-    <h1>Index page</h1>
-    <h2>{{ message }}</h2>
+    <div 
+      v-for="segment in $store.state.segments"
+      :key="segment.uuid"
+      style="padding-bottom: 50px; text-align: left"
+    >
+      <h2>{{ segment.name }}</h2>
 
-    <img v-bind:src="require('@/assets/logo.png')">
-    <FooterModule/>
-  </div>
+      <table 
+        class="table" 
+        style="margin-top: auto; margin-bottom: auto;"
+      >
+        <thead>
+          <tr>
+            <th scope="col">Image Name</th>
+            <th scope="col">Container</th>
+            <th scope="col">URL</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr 
+            v-for="(value, key) in segment.images"
+            :key="key"
+          >
+            <td>{{ key }}</td>
+            <td>{{ value.container }}</td>  
+            <td>{{ value.url }}</td>     
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </b-container>
+
+</div>
 </template>
 
 <script>
-import HeaderModule from '@/components/HeaderModule'
-import FooterModule from '@/components/FooterModule'
+
 
 export default {
   name: 'IndexView',
   components: {
-    HeaderModule,
-    FooterModule,
+
   },
 
   data () {

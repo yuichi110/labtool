@@ -1,3 +1,17 @@
+Setup procedure.
+(1) Django
+1. make django dir
+2. cd django dir
+3. make django project on the directory.
+
+(2) 
+
+
+
+
+
+=====
+
 (1) Deploy
 
 Development

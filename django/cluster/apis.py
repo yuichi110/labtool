@@ -13,6 +13,10 @@ import json
 class ClusterApi:
 
   @classmethod
+  def cluster_status(cls, request):
+    return HttpResponse(response_body, content_type='application/json')
+    
+  @classmethod
   def clusters(cls, request):
     def get(request):
       cluster_objects = Cluster.objects.all()

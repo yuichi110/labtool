@@ -1,24 +1,21 @@
 <template>
   <div>
-    <HeaderModule/>
+
 
     <h1>Index page</h1>
     <h2>{{ message }}</h2>
 
     <img v-bind:src="require('@/assets/logo.png')">
-    <FooterModule/>
   </div>
 </template>
 
 <script>
 import HeaderModule from '@/components/HeaderModule'
-import FooterModule from '@/components/FooterModule'
 
 export default {
   name: 'TaskListView',
   components: {
-    HeaderModule,
-    FooterModule,
+
   },
 
   data () {
