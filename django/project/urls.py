@@ -29,6 +29,8 @@ urlpatterns = [
     path('api/clusters/', ClusterApi.clusters),
     path('api/clusters/<str:uuid>', ClusterApi.cluster),
 
+    path('api/cluster_status/<str:uuid>', ClusterApi.cluster_status),
+
     path('api/operations/foundation', OperationApi.foundation),
     path('api/operations/foundation/', OperationApi.foundation),
 

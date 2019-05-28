@@ -12,17 +12,17 @@ read -s password
 
 # kill node(vue)
 {
-  pids_port8000=`lsof -ti tcp:8000`
+  pids_port8000=`echo "$password" | sudo -S lsof -ti tcp:8000`
   for pid in $pids_port8000 ; do
-    kill -9 $pid
+    echo "$password" | sudo -S kill -9 $pid
   done
 } &
 
 # kill django
 {
-  pids_port8080=`lsof -ti tcp:8080`
+  pids_port8080=`echo "$password" | sudo -S lsof -ti tcp:8080`
   for pid in $pids_port8000 ; do
-    kill -9 $pid
+    echo "$password" | sudo -S kill -9 $pid
   done
 } &
 

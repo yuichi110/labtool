@@ -9,10 +9,11 @@
         <tr>
           <th scope="col">Cluster</th>
           <th scope="col">Segment</th>
-          <th scope="col">Physically Exist</th>
-          <th scope="col">Host Reachable</th>
-          <th scope="col">Cluster Up</th>
-          <th scope="col">AOS Version</th>
+          <th scope="col">Prism IP</th>
+          <th scope="col">IPMI MAC</th>
+          <th scope="col">Host IP</th>
+          <th scope="col">Cluster Login</th>
+          <th scope="col">Version</th>
           <th scope="col">Hypervisor</th>
           <th scope="col">Actions</th>
         </tr>
@@ -25,11 +26,23 @@
         >
           <td>{{ cluster.name }}</td>
           <td>{{ cluster.segment_name }}</td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
+          <td>{{ cluster.external_ip }}</td>
+          <td>
+            <span style="color: green" v-if="physical_check_result(cluster.physical_check) == 0"><i class="fas fa-check-circle"></i></span>
+            <span style="color: orange" v-else-if="physical_check_result(cluster.physical_check) == 1"><i class="fas fa-exclamation-circle"></i></span>
+            <span style="color: red" v-else><i class="fas fa-times-circle"></i></span>
+          </td>
+          <td>
+            <span style="color: green" v-if="host_check_result(cluster.host_check) == 0"><i class="fas fa-check-circle"></i></span>
+            <span style="color: orange" v-else-if="host_check_result(cluster.host_check) == 1"><i class="fas fa-exclamation-circle"></i></span>
+            <span style="color: red" v-else><i class="fas fa-times-circle"></i></span>
+          </td>
+          <td>
+            <span style="color: green" v-if="cluster.prism_check"><i class="fas fa-check-circle"></i></span>
+            <span style="color: red" v-else><i class="fas fa-times-circle"></i></span>
+          </td>
+          <td>{{ cluster.version }}</td>
+          <td>{{ cluster.hypervisor }}</td>
           <td>
             <a style="color: blue; cursor: pointer;" @click="() => { start_clicked(cluster.uuid) }">Start</a>
             <a style="color: red; cursor: pointer; margin-left: 20px" @click="() => { stop_clicked(cluster.uuid) }">Stop</a>
@@ -108,10 +121,52 @@ export default {
         return true
       }
       return false
-    }
+    },
   },
 
   methods: {
+    physical_check_result: function(checks){
+      let all_ok = true
+      let all_ng = true
+      for(let key in checks){
+        let value = checks[key]
+        if(value){
+          all_ng = false
+        }else{
+          all_ok = false
+        }
+      }
+
+      if(all_ng){
+        return 2
+      }
+      if(all_ok){
+        return 0
+      }
+      return 1
+    },
+
+    host_check_result: function(checks){
+      let all_ok = true
+      let all_ng = true
+      for(let key in checks){
+        let value = checks[key]
+        if(value){
+          all_ng = false
+        }else{
+          all_ok = false
+        }
+      }
+
+      if(all_ng){
+        return 2
+      }
+      if(all_ok){
+        return 0
+      }
+      return 1
+    },
+
     stop_clicked: function(uuid){
       this.selected_cluster = uuid
 

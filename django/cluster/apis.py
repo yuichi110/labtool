@@ -13,8 +13,29 @@ import json
 class ClusterApi:
 
   @classmethod
-  def cluster_status(cls, request):
-    return HttpResponse(response_body, content_type='application/json')
+  def cluster_status(cls, request, uuid):
+    if request.method != 'PUT':
+      response_body = json.dumps({'error':"unsupported method : '{}'".format(request.method)}, indent=2)
+      return HttpResponseBadRequest(response_body, content_type='application/json')
+
+    try:
+      cluster = Cluster.objects.get(uuid=uuid)
+    except:
+      response_body = json.dumps({'error':"cluster not found"}, indent=2)
+      return HttpResponseNotFound(response_body, content_type='application/json')
+
+    try:
+      text = request.body.decode()
+      d = json.loads(text)
+    except:
+      response_body = json.dumps({'error':"cluster not found"}, indent=2)
+      return HttpResponseNotFound(response_body, content_type='application/json')
+
+    print(text)
+    cluster.status = text
+    cluster.save()
+
+    return HttpResponse('{}', content_type='application/json')
     
   @classmethod
   def clusters(cls, request):

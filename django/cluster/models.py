@@ -13,7 +13,7 @@ class Cluster(models.Model):
   uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   asset = models.OneToOneField(Asset, on_delete=models.CASCADE, editable=False)
   segment = models.ForeignKey(Segment, on_delete=models.CASCADE)
-  #status = models.TextField()
+  status = models.TextField(blank=True)
 
   def __str__(self):
     return 'Asset:{}, Segment:{}, UUID:{}'.format(self.asset.name, self.segment.name, self.uuid)
@@ -43,6 +43,20 @@ class Cluster(models.Model):
     cluster_dict['asset_name'] = self.asset.name
     cluster_dict['segment_uuid'] = str(self.segment.uuid)
     cluster_dict['segment_name'] = self.segment.name
+
+    try:
+      d = json.loads(self.status)
+      cluster_dict['physical_check'] = d['physical_check']
+      cluster_dict['host_check'] = d['host_check']
+      cluster_dict['prism_check'] = d['prism_check']
+      cluster_dict['version'] = d['version']
+      cluster_dict['hypervisor'] = d['hypervisor']
+    except:
+      cluster_dict['physical_check'] = {}
+      cluster_dict['host_check'] = {}
+      cluster_dict['prism_check'] = False
+      cluster_dict['version'] = ''
+      cluster_dict['hypervisor'] = ''
     
     return cluster_dict
 
