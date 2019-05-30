@@ -13,17 +13,19 @@ from background_tasks import FoundationTask
 class OperationApi:
 
   @classmethod
-  def start(cls, request):
+  def start(cls, request, uuid):
     if request.method not in ['POST']:
       response_body = json.dumps({'error':"unsupported method : '{}'".format(request.method)}, indent=2)
       return HttpResponseBadRequest(response_body, content_type='application/json')
+    return HttpResponse('{}', content_type='application/json')
 
 
   @classmethod
-  def stop(cls, request):
+  def stop(cls, request, uuid):
     if request.method not in ['POST']:
       response_body = json.dumps({'error':"unsupported method : '{}'".format(request.method)}, indent=2)
       return HttpResponseBadRequest(response_body, content_type='application/json')
+    return HttpResponse('{}', content_type='application/json')
 
 
   @classmethod

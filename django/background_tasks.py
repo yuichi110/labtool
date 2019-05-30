@@ -2,6 +2,8 @@ import threading
 import time
 import json
 import requests
+import subprocess
+import paramiko
 
 from task.models import Task
 from nutanix_foundation import FoundationOps
@@ -11,14 +13,12 @@ import django.core.management.commands.runserver as runserver
 cmd = runserver.Command()
 PORT = cmd.default_port
 
+
+
 class FoundationTask(threading.Thread):
   def __init__(self, task_uuid, cluster_dict, aos_image, hypervisor_type, hypervisor_image):
     threading.Thread.__init__(self)
-    tasks = Task.objects.filter(uuid=task_uuid)
-    if len(tasks) > 0:
-      self.task = tasks[0]
-    else:
-      raise Exception('no task uuid')
+    self.task = Task.objects.get(uuid=task_uuid)
     self.task_uuid = task_uuid
     self.cluster_dict = cluster_dict
     self.aos_image = aos_image
@@ -35,6 +35,69 @@ class FoundationTask(threading.Thread):
       pass
 
     self.task.is_complete = True
+
+
+class ClusterStartTask(threading.Thread):
+  def __init__(self, task_uuid, ipmi_ips, cvm_ips, prism_ip, prism_user, prism_password):
+    threading.Thread.__init__(self)
+    self.task = Task.objects.get(uuid=task_uuid)
+    self.task_uuid = task_uuid
+    self.ipmi_ips = ipmi_ips
+    self.cvm_ips = cvm_ips
+    self.prism_ip = prism_ip
+    self.prism_user = prism_user
+    self.prism_password = prism_password
+
+  def run(self):
+
+
+
+    def all_ipmi_up(ipmi_ips):
+      for ipmi_ip in ipmi_ips:
+        power_on = ipmitool_is_power_on(ipmi_ip, 'ADMIN', 'ADMIN')
+
+
+
+    try:
+      cluster_up = False
+      for i in range(5):
+        if not is_all_ipmi_up(self.ipmi_ips):
+          all_ipmi_up(self.ipmi_ips)
+          time.sleep(60)
+          continue
+
+        if not is_all_cvm_up(self.cvm_ips):
+          time.sleep(120)
+          continue
+
+        prism_ip_up = cvm_is_power_on(self.prism_ip, 'nutanix', 'nutanix/4u')
+        if not prism_ip_up:
+          cvm_ip = cvm_ips[0]
+          issue_cluster_start(cvm_ip, 'nutanix', 'nutanix/4u')
+          time.sleep(60)
+          continue
+
+        cluster_up = True
+        break
+
+    except:
+      pass
+
+    self.task.is_complete = True
+    self.task.save()
+
+
+class ClusterStopTask(threading.Thread):
+  def __init__(self, task_uuid, prism_ip, prism_user, prism_password):
+    threading.Thread.__init__(self)
+    self.task = Task.objects.get(uuid=task_uuid)
+    self.task_uuid = task_uuid    
+    self.prism_ip = prism_ip
+    self.prism_user = prism_user
+    self.prism_password = prism_password
+
+  def run(self):
+    pass
 
 class StatusCheckTask(threading.Thread):
   def __init__(self, cluster_uuid, fvm_ip, fvm_user, fvm_password, ipmi_mac_list, host_ips, prism_ip, prism_user, prism_password, sleep):
