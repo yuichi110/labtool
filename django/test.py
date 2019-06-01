@@ -90,5 +90,36 @@ def test_foundation(cluster_name, aos_image):
     request_body = json.dumps(d, indent=2)
     response = requests.post('http://127.0.0.1:8000/api/operations/foundation', data=request_body)
 
+def test_start(cluster_name):
+  response = requests.get('http://127.0.0.1:8000/api/clusters')
+  uuid = ''
+  for cluster in response.json():
+    if cluster['name'] != cluster_name:
+      continue
+    uuid = cluster['uuid']
+
+  if uuid == '':
+    print('Failed to find the cluster. Abort.')
+    exit()
+
+  response = requests.post('http://127.0.0.1:8000/api/operations/start/{}'.format(uuid))
+
+def test_stop(cluster_name):
+  response = requests.get('http://127.0.0.1:8000/api/clusters')
+  uuid = ''
+  for cluster in response.json():
+    if cluster['name'] != cluster_name:
+      continue
+    uuid = cluster['uuid']
+
+  if uuid == '':
+    print('Failed to find the cluster. Abort.')
+    exit()
+
+  response = requests.post('http://127.0.0.1:8000/api/operations/stop/{}'.format(uuid))
+
 if __name__ == '__main__':
-  test_foundation('poc10', 'nutanix_installer_package-release-euphrates-5.5.7-stable.tar')
+  #test_foundation('poc10', 'nutanix_installer_package-release-euphrates-5.5.7-stable.tar')
+  #test_start('poc10')
+  test_stop('poc10')
+  

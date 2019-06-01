@@ -3,7 +3,6 @@
   <b-container>
     <h1>Clusters</h1>
 
-
     <table class="table table-borderless" style="margin-top: auto; margin-bottom: auto;">
       <thead>
         <tr>
@@ -54,9 +53,13 @@
 
   </b-container>
 
-  <b-modal id="cluster-stop-modal" title="Cluster Stop" >
+  <b-modal id="cluster-stop-modal" title="Cluster Stop" hide-footer>
     <b-container>
-      Cluster Stop
+      <div slot="modal-footer" class="w-100">
+        <b-button block variant="danger" 
+          @click="() => { cluster_stop() }"
+        >Gracefull Cluster Stop</b-button>
+      </div>
     </b-container>
   </b-modal>
 
@@ -167,10 +170,35 @@ export default {
       return 1
     },
 
+    start_clicked: function(uuid){
+      axios.post('/api/operations/start/' + uuid)
+      .then((response) => {
+        console.log(response)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+
+      this.$store.dispatch('task_start')
+    },
+
     stop_clicked: function(uuid){
       this.selected_cluster = uuid
 
       this.$bvModal.show('cluster-stop-modal')
+    },
+
+    cluster_stop: function(){
+      axios.post('/api/operations/stop/' + this.selected_cluster)
+      .then((response) => {
+        console.log(response)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+
+      $bvModal.hide('cluster-stop-modal')
+      this.$store.dispatch('task_start')
     },
 
     foundation_clicked: function(uuid){
@@ -216,6 +244,9 @@ export default {
       .catch((error) => {
         console.log(error)
       })
+
+      $bvModal.hide('cluster-foundation-modal')
+      this.$store.dispatch('task_start')
     }
   },
 

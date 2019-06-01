@@ -9,6 +9,9 @@ export default new Vuex.Store({
     clusters: [],
     assets: [],
     segments: [],
+    tasks: [],
+
+    task_spinning: false,
   },
 
   mutations: {
@@ -22,6 +25,14 @@ export default new Vuex.Store({
 
     set_segments(state, data){
       state.segments = data
+    },
+
+    set_tasks(state, data){
+      state.tasks = data
+    },
+
+    set_task_spinning(state, bool){
+      state.task_spinning = bool
     }
   },
 
@@ -55,5 +66,24 @@ export default new Vuex.Store({
         console.log('Error: ' + error)
       })
     },
+
+    tasks_get({ dispatch, commit, state }){
+      return axios.get('/api/tasks/')
+      .then((response) => {
+        commit('set_tasks', response.data)
+      })
+      .catch((error) => {
+        console.log('Error: ' + error)
+      })
+    },
+
+    task_start({ dispatch, commit, state }){
+      commit('set_task_spinning', true)
+      
+      let fun = function(){
+        commit('set_task_spinning', false)
+      }
+      setTimeout(fun, 2 * 1000)
+    }
   }
 })

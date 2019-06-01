@@ -11,13 +11,19 @@ class Task(models.Model):
   creation_time = models.DateTimeField(auto_now_add=True)
   update_time = models.DateTimeField(auto_now=True)
 
+  def __str__(self):
+    return 'Name:{}, UUID:{}'.format(self.name, self.uuid)
+
+  class Meta:
+    ordering = ['-creation_time']
+
   def get_dict(self):
     d = {
       'uuid':str(self.uuid),
       'name':self.name,
-      'data':json.loads(self.data),
+      'status':self.data,
       'is_complete':self.is_complete,
-      'creation_time':str(self.creation_time),
-      'update_time':str(self.update_time)
+      'creation_time':str(self.creation_time).split('.')[0],
+      'update_time':str(self.update_time).split('.')[0]
     }
     return d

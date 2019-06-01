@@ -31,7 +31,6 @@ class ClusterApi:
       response_body = json.dumps({'error':"cluster not found"}, indent=2)
       return HttpResponseNotFound(response_body, content_type='application/json')
 
-    print(text)
     cluster.status = text
     cluster.save()
 

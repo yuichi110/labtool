@@ -1,12 +1,34 @@
 <template>
-  <div>
+<div>
+  <b-container>
 
+    <h1>Tasks</h1>
+    
+    <table class="table table-borderless" style="margin-top: auto; margin-bottom: auto;">
+      <thead>
+        <tr>
+          <th scope="col">Created At</th>
+          <th scope="col">Updated At</th>
+          <th scope="col">Task Name</th>
+          <th scope="col">Status</th>
+        </tr>
+      </thead>
 
-    <h1>Index page</h1>
-    <h2>{{ message }}</h2>
+      <tbody>
+        <tr 
+          v-for="task in $store.state.tasks"
+          :key="task.uuid"
+        >
+          <td>{{ task.creation_time }}</td>
+          <td>{{ task.update_time }}</td>
+          <td>{{ task.name }}</td>
+          <td><pre style="text-align:left">{{ task.status }}</pre></td>
+        </tr>
+      </tbody>
+    </table>
 
-    <img v-bind:src="require('@/assets/logo.png')">
-  </div>
+  </b-container>
+</div>
 </template>
 
 <script>

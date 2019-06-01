@@ -24,6 +24,7 @@ class ClusterStartOps:
     self.prism_password = prism_password
 
   def power_on_all_servers(self):
+    print('power_on_all_servers()')
 
     def is_server_power_on(ip, user, password):
       try:
@@ -62,12 +63,14 @@ class ClusterStartOps:
       if is_all_server_power_on(self.ipmi_ips):
         return
       for ipmi_ip in self.ipmi_ips:
+        print('power on server on ipmi: {}'.format(ipmi_ip))
         power_on_server(ipmi_ip, 'ADMIN', 'ADMIN')
       time.sleep(20)
+
     raise Exception("Unable to power on servers via IPMI.")
 
-  
-  def power_on_all_cvms(self):
+  def check_all_hosts_are_accessible(self):
+    print('check_all_hosts_are_accessible()')
 
     def is_host_accessible(host_ip, user, password):
       try:
@@ -92,13 +95,39 @@ class ClusterStartOps:
 
     # Check all hosts are up
     ok = False
-    for i in range(5):
+    for i in range(10):
       if is_all_host_accessible(self.host_ips, 'root', 'nutanix/4u'):
         ok = True
         break
+      print('Waiting all hosts are up and accessible via ssh.')
       time.sleep(60)
     if not ok:
       raise Exception('Unable to access few hosts')
+
+  
+  def power_on_all_cvms(self):
+    print('power_on_all_cvms()')
+
+    def is_host_accessible(host_ip, user, password):
+      try:
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(host_ip, username=user, password=password, timeout=3.0)
+        command = 'date'
+        client.exec_command(command)
+      except Exception as e:
+        print(e)
+        return False
+      return True
+
+    def is_all_host_accessible(host_ips, user, password):
+      all_up = True
+      for host_ip in host_ips:
+        power_on = is_host_accessible(host_ip, user, password)
+        if not power_on:
+          all_up = False
+          break
+      return all_up
 
     # Check all CVMs are up
     ok = False
@@ -106,20 +135,24 @@ class ClusterStartOps:
       if is_all_host_accessible(self.cvm_ips, 'nutanix', 'nutanix/4u'):
         ok = True
         break
+      print('Waiting all CVMs are up and accessible via ssh.')
       time.sleep(30)
     if not ok:
       raise Exception('Unable to access few cvms')
 
 
   def start_cluster(self):
+    print('start_cluster()')
 
-    def issue_cluster_start(self, ip, user, password):
+    def issue_cluster_start(cvm_ip, user, password):
       try:
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(cvm_ip, username='nutanix', password='nutanix/4u', timeout=3.0)
-        command = 'cluster start'
-        client.exec_command(command)
+        client.connect(cvm_ip, username=user, password=password, timeout=3.0)
+        command = '/usr/local/nutanix/cluster/bin/cluster start'
+        stdin, stdout, stderr = client.exec_command(command)
+        print(stdout.read().decode().strip())
+        print(stderr.read().decode().strip())
       except Exception as e:
         print(e)
 
@@ -135,22 +168,24 @@ class ClusterStartOps:
 
 class ClusterStopOps:
   
-  def __init__(self, ip, user, password):
-    self.ip = ip
-    self.user = user
-    self.password = password
-    self.session = NutanixRestApiClient(ip, user, password)
+  def __init__(self, prism_ip, prism_user, prism_password):
+    self.prism_ip = prism_ip
+    self.prism_user = prism_user
+    self.prism_password = prism_password
+    
+    self.session = NutanixRestApiClient(prism_ip, prism_user, prism_password)
     (success, result) = self.session.get_ipmi_host_cvm_ips()
     if not success:
-      raise Exception()
-
+      raise Exception("Failed to get IPs")
     (self.ipmi_list, self.host_list, self.cvm_list) = result
 
 
   def stop_calm(self):
+    print('stop_calm()')
     pass
 
   def stop_non_agent_guests(self):
+    print('stop_non_agent_guests()')
 
     def get_poweredon_guest_vms():
       (_, pc_vms) = self.session.get_pc_vms()
@@ -185,17 +220,19 @@ class ClusterStopOps:
     # Stop normal guest vms.
     for i in range(5):
       poweredon_guest_vms = get_poweredon_guest_vms()
-      if len(poweredon_guestvms) == 0:
+      if len(poweredon_guest_vms) == 0:
         break
 
       if i > 3:
-        stop_vms(poweredon_guestvms, True)
+        stop_vms(poweredon_guest_vms, True)
       else:
-        stop_vms(poweredon_guestvms)
+        stop_vms(poweredon_guest_vms)
       time.sleep(10)
 
 
   def stop_files(self):
+    print('stop_files()')
+
     def issue_stop_command():
       try:
         client = paramiko.SSHClient()
@@ -217,13 +254,15 @@ class ClusterStopOps:
 
     issue_stop_command()
     (_, fsvms) = self.session.get_fsvms()
-    for i in range(20)
+    for i in range(20):
       if is_all_fsvm_down(fsvms):
         return
       time.sleep(10)
 
 
   def stop_pc(self):
+    print('stop_pc()')
+
     def pc_cluster_stop(pc_ip):
       try:
         client = paramiko.SSHClient()
@@ -244,7 +283,7 @@ class ClusterStopOps:
         stdin, stdout, stderr = client.exec_command(command)
         buf = stdout.read().decode().strip()
         cluster_state = buf.split()
-        return cluster_state[-1] == "stop":
+        return cluster_state[-1] == "stop"
       except Exception as e:
         print(e)
       return False
@@ -309,6 +348,7 @@ class ClusterStopOps:
 
 
   def stop_all_vms(self):
+    print('stop_all_vms()')
 
     def stop_vms(vm_list, force=False):
       if len(vm_list) == 0:
@@ -339,6 +379,8 @@ class ClusterStopOps:
 
 
   def stop_cluster(self):
+    print('stop_cluster()')
+
     def cluster_stop(cvm_ip):
       try:
         client = paramiko.SSHClient()
@@ -359,7 +401,7 @@ class ClusterStopOps:
         stdin, stdout, stderr = client.exec_command(command)
         buf = stdout.read().decode().strip()
         cluster_state = buf.split()
-        return cluster_state[-1] == "stop":
+        return cluster_state[-1] == "stop"
       except Exception as e:
         print(e)
       return False
@@ -371,6 +413,7 @@ class ClusterStopOps:
 
 
   def stop_cvms(self):
+    print('stop_cvms()')
 
     def cvm_stop(cvm_ip):
       try:
@@ -380,7 +423,6 @@ class ClusterStopOps:
 
         command = "sudo /usr/sbin/shutdown -h now"
         stdin, stdout, stderr = client.exec_command(command)
-        print(stdout.read().decode().strip())
       except Exception as e:
         print(e)
 
@@ -412,6 +454,8 @@ class ClusterStopOps:
 
 
   def stop_hosts(self):
+    print('stop_hosts()')
+
     def stop_host(host_ip):
       try:
         client = paramiko.SSHClient()
@@ -420,7 +464,6 @@ class ClusterStopOps:
 
         command = "shutdown -h now"
         stdin, stdout, stderr = client.exec_command(command)
-        print(stdout.read().decode().strip())
       except Exception as e:
         print(e)
 
@@ -489,9 +532,23 @@ def test_ClusterStartOps():
     ['10.149.161.21', '10.149.161.22', '10.149.161.23', '10.149.161.24'], 
     ['10.149.161.31', '10.149.161.32', '10.149.161.33', '10.149.161.34'],
     '10.149.161.41', 'admin', 'Nutanix/4u!123')
-
   ops.power_on_all_servers()
+  ops.check_all_hosts_are_accessible()
   ops.power_on_all_cvms()
+  ops.start_cluster()
+
+def test_ClusterStopOps():
+  ops = ClusterStopOps('10.149.161.41', 'admin', 'Nutanix/4u!123')
+  ops.stop_calm()
+  ops.stop_files()
+  ops.stop_non_agent_guests()
+  ops.stop_pc()
+  ops.stop_all_vms()
+  ops.stop_cluster()
+  ops.stop_cvms()
+  ops.stop_hosts()
+
 
 if __name__ == '__main__':
-  test_ClusterStartOps()
+  #test_ClusterStartOps()
+  test_ClusterStopOps()

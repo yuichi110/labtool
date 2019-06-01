@@ -1,6 +1,6 @@
 <template>
 <b-container>
-  <nav class="navbar navbar-expand-lg navbar-light">
+  <nav class="navbar navbar-expand-lg navbar-light" style="margin-top: auto; margin-bottom: auto; height:">
     <b-navbar-brand :to="{name:'ClusterListView'}">Founder</b-navbar-brand>
 
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
@@ -10,6 +10,12 @@
         <b-nav-item :to="{name:'ClusterListView'}">Clusters</b-nav-item>
         <b-nav-item :to="{name:'AssetListView'}">Assets</b-nav-item>
         <b-nav-item :to="{name:'SegmentListView'}">Segments</b-nav-item>
+        <b-nav-item :to="{name:'TaskListView'}">
+          Tasks
+          <b-spinner 
+          v-if="$store.state.task_spinning"
+          small variant="primary" label="Spinning"></b-spinner>
+        </b-nav-item>
       </b-navbar-nav>
 
     </b-collapse>

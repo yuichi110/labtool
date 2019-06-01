@@ -49,3 +49,30 @@ class TaskApi:
     else:
       response_body = json.dumps({'error':"unsupported method : '{}'".format(request.method)}, indent=2)
       return HttpResponseBadRequest(response_body, content_type='application/json')
+
+  @classmethod
+  def task_status(cls, request, uuid):
+    if request.method != 'PUT':
+      response_body = json.dumps({'error':"unsupported method : '{}'".format(request.method)}, indent=2)
+      return HttpResponseBadRequest(response_body, content_type='application/json')
+
+    try:
+      json_text = request.body.decode()
+      d = json.loads(json_text)
+      status = d['status']
+      finished = d['finished']
+    except:
+      response_body = json.dumps({'error':"request body has problem"}, indent=2)
+      return HttpResponseBadRequest(response_body, content_type='application/json')
+
+    try:
+      task = Task.objects.get(uuid=uuid)
+    except:
+      response_body = json.dumps({'error':'object not found'}, indent=2)
+      return HttpResponseNotFound(response_body, content_type='application/json')
+
+    task.data = status
+    task.is_complete = finished
+    task.save()
+    
+    return HttpResponse('{}', content_type='application/json')

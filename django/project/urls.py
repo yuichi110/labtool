@@ -33,10 +33,13 @@ urlpatterns = [
 
     path('api/operations/foundation', OperationApi.foundation),
     path('api/operations/foundation/', OperationApi.foundation),
+    path('api/operations/start/<str:uuid>', OperationApi.start),
+    path('api/operations/stop/<str:uuid>', OperationApi.stop),
 
     path('api/tasks', TaskApi.tasks),
     path('api/tasks/', TaskApi.tasks),
     path('api/tasks/<str:uuid>', TaskApi.task),
+    path('api/task_status/<str:uuid>', TaskApi.task_status),
     
     path('test', ClusterApi.test),
 ]

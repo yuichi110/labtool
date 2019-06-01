@@ -26,11 +26,18 @@ export default {
       this.$store.dispatch('assets_get')
       this.$store.dispatch('segments_get')
     },
+
+    updateTasks: function(){
+      this.$store.dispatch('tasks_get')
+    }
   },
 
   created(){
     this.updateStatus()
     setInterval(this.updateStatus, 60 * 1000)
+
+    this.updateTasks()
+    setInterval(this.updateTasks, 15 * 1000)
   }
 }
 </script>
