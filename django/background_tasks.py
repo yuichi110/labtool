@@ -4,9 +4,10 @@ import json
 import requests
 import subprocess
 import paramiko
+import traceback
 
 from task.models import Task
-from nutanix_foundation import FoundationOps
+from nutanix_foundation import FoundationOps, EulaOps, SetupOps
 from nutanix_cluster import CheckStatusOps, ClusterStartOps, ClusterStopOps
 
 import django.core.management.commands.runserver as runserver
@@ -26,38 +27,193 @@ def send_task_update(task_uuid, status, finished=False):
 class FoundationTask(threading.Thread):
   def __init__(self, task_uuid, cluster_dict, aos_image, hypervisor_type, hypervisor_image):
     threading.Thread.__init__(self)
-    self.task = Task.objects.get(uuid=task_uuid)
     self.task_uuid = task_uuid
     self.cluster_dict = cluster_dict
     self.aos_image = aos_image
     self.hypervisor_type = hypervisor_type
     self.hypervisor_image = hypervisor_image
 
+    self.connect_to_fvm = ''
+    self.check_ipmi_mac = ''
+    self.check_ipmi_ip = ''
+    self.check_fvm_isnot_imaging = ''
+    self.check_fvm_has_nos_package = ''
+    self.set_foundation_settings = ''
+    self.configure_ipmi_ip = ''
+    self.pre_check = ''
+    self.start_foundation = ''
+    self.foundation_progress = ''
+
+    self.initial_password = ''
+    self.connect_to_prism1 = ''
+    self.set_eula_settings = ''
+
+    self.connect_to_prism2 = ''
+    self.basics = ''
+    self.containers = ''
+    self.networks = ''
+    self.imaging = ''
+
+
   def status(self):
-    return ''
+    text = 'Foundation\n'
+    text += '  Login to FVM              : {}\n'.format(self.connect_to_fvm)
+    text += '  Check IPMI MAC exist      : {}\n'.format(self.check_ipmi_mac)
+    text += '  Check IPMI IP conflict    : {}\n'.format(self.check_ipmi_ip)
+    text += '  Check FVM is not imaging  : {}\n'.format(self.check_fvm_isnot_imaging)
+    text += '  Check FVM has nos image   : {}\n'.format(self.check_fvm_has_nos_package)
+    text += '  Apply foundation settings : {}\n'.format(self.set_foundation_settings)
+    text += '  Configure IPMI IP         : {}\n'.format(self.configure_ipmi_ip)
+    text += '  Pre Check                 : {}\n'.format(self.pre_check)
+    text += '  Kick imaging              : {}\n'.format(self.start_foundation)
+    text += '  Progress                  : {}\n\n'.format(self.foundation_progress)
+
+    text += 'Eula\n'
+    text += '  Set initial password      : {}\n'.format(self.initial_password)
+    text += '  Login to Prism            : {}\n'.format(self.connect_to_prism1)
+    text += '  Set Eula/Pulse/Alert/Pass : {}\n\n'.format(self.set_eula_settings)
+
+    text += 'Settings\n'
+    text += '  Login to Prism            : {}\n'.format(self.connect_to_prism2)
+    text += '  Setup Basics              : {}\n'.format(self.basics)
+    text += '  Setup Container           : {}\n'.format(self.containers)
+    text += '  Setup Network             : {}\n'.format(self.networks)  
+    text += '  Kick downloading images   : {}\n'.format(self.imaging) 
+    return text
 
   def run(self):
     try:
-      fo = FoundationOps(self.cluster_dict, self.aos_image)
-      fo.connect_to_fvm()
-      fo.check_ipmi_mac_ip()
-      fo.check_fvm_isnot_imaging()
-      fo.check_fvm_has_nos_package()
-      fo.set_foundation_settings()
-      fo.configure_ipmi_ip()
-      fo.pre_check()
-      fo.start_foundation()
+      self.foundation()
+      self.eula()
+      self.setup()
 
-      while(True):
-        fo.get_foundation_progress()
-        break
+    except Exception as e:
+      print(e)
+      print(traceback.format_exc())
 
-      eo = EuraOps()
+    self.setup_images = 'Done'
+    send_task_update(self.task_uuid, self.status(), True)
 
-    except:
-      pass
+  def foundation(self):
+    fo = FoundationOps(self.cluster_dict, self.aos_image)
 
-    self.task.is_complete = True
+    self.connect_to_fvm = 'Running'
+    send_task_update(self.task_uuid, self.status())
+    fo.connect_to_fvm()
+
+    self.connect_to_fvm = 'Done'
+    self.check_ipmi_mac = 'Running'
+    send_task_update(self.task_uuid, self.status())
+    fo.check_ipmi_mac()
+
+    self.check_ipmi_mac = 'Done'
+    self.check_ipmi_ip = 'Running'
+    send_task_update(self.task_uuid, self.status())
+    fo.check_ipmi_ip()
+
+    self.check_ipmi_ip = 'Done'
+    self.check_fvm_isnot_imaging = 'Running'
+    send_task_update(self.task_uuid, self.status())
+    fo.check_fvm_isnot_imaging()
+
+    self.check_fvm_isnot_imaging = 'Done'
+    self.check_fvm_has_nos_package = 'Running'
+    send_task_update(self.task_uuid, self.status())
+    fo.check_fvm_has_nos_package()
+
+    self.check_fvm_has_nos_package = 'Done'
+    self.set_foundation_settings = 'Running'
+    send_task_update(self.task_uuid, self.status())
+    fo.set_foundation_settings()
+
+    self.set_foundation_settings = 'Done'
+    self.configure_ipmi_ip = 'Running'
+    send_task_update(self.task_uuid, self.status())
+    fo.configure_ipmi_ip()
+
+    self.configure_ipmi_ip = 'Done'
+    self.pre_check = 'Running'
+    send_task_update(self.task_uuid, self.status())
+    fo.pre_check()
+
+    self.pre_check = 'Done'
+    self.start_foundation = 'Running'
+    send_task_update(self.task_uuid, self.status())
+    fo.start_foundation()
+
+    self.start_foundation = 'Done'
+    self.watch_foundation(fo)
+
+  def watch_foundation(self, fo):
+    error_counter = 0
+    while(True):
+      (success, progress) = fo.get_foundation_progress()
+      if success:
+        self.foundation_progress = '{} %'.format(progress)
+        send_task_update(self.task_uuid, self.status())
+        if progress == 100:
+          time.sleep(3)
+          break
+        error_counter = 0
+        time.sleep(15)
+
+      else:
+        error_counter += 1
+        if error_counter >= 5:
+          print('  Failed to getting progress 5 times sequentially. Abort.')
+          raise ErrorException('Failed to getting progress 5 times sequentially.')
+        time.sleep(3)
+
+  def eula(self):
+    eo = EulaOps(self.cluster_dict)
+
+    self.initial_password = 'Running'
+    send_task_update(self.task_uuid, self.status())
+    eo.set_initial_password()
+
+    self.initial_password = 'Done'
+    self.connect_to_prism1 = 'Running'
+    send_task_update(self.task_uuid, self.status())
+    eo.connect_to_prism()
+
+    self.connect_to_prism1 = 'Done'
+    self.set_eula_settings = 'Running'
+    send_task_update(self.task_uuid, self.status())
+    eo.set_initial_settings()
+
+    self.set_eula_settings = 'Done'
+    send_task_update(self.task_uuid, self.status())
+
+
+  def setup(self):
+    so = SetupOps(self.cluster_dict)
+
+    self.connect_to_prism2 = 'Running'
+    send_task_update(self.task_uuid, self.status())
+    so.connect_to_prism()
+
+    self.connect_to_prism2 = 'Done'
+    self.basics = 'Running'
+    send_task_update(self.task_uuid, self.status())
+    so.setup_basics()
+
+    self.basics = 'Done'
+    self.containers = 'Running'
+    send_task_update(self.task_uuid, self.status())
+    so.setup_containers()
+
+    self.containers = 'Done'
+    self.networks = 'Running'
+    send_task_update(self.task_uuid, self.status())
+    so.setup_networks()
+
+    self.networks = 'Done'
+    self.imaging = 'Running'
+    send_task_update(self.task_uuid, self.status())
+    so.setup_images()
+
+    self.imaging = 'Done'
+    send_task_update(self.task_uuid, self.status(), True)
 
 
 class ClusterStartTask(threading.Thread):

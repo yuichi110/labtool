@@ -6,8 +6,6 @@ import os
 import traceback
 from nutanix_restapi import NutanixFoundationClient, NutanixRestApiClient
 
-INITIAL_PASSWORD = 'nutanix/4u'
-TEMPORARY_PASSWORD = 'SREs4eva!'
 CONFIG_FILE = 'foundation_config.json'
 
 ###
@@ -16,9 +14,25 @@ CONFIG_FILE = 'foundation_config.json'
 
 class FoundationOps:
 
-  def __init__(self, cluster, nos_version):
+  def __init__(self, cluster, nos_package):
     self.cluster = cluster
-    self.nos_version = nos_version
+    self.nos_package = nos_package
+
+    self.netmask = cluster['netmask']
+    self.gateway = cluster['gateway']
+    self.cluster_name = cluster['name']
+    self.external_ip = cluster['external_ip']
+    self.name_server = cluster['name_server']
+    self.ntp_server = cluster['ntp_server']
+
+    def get_nodeinfo_list(cluster):
+      nodeinfo_list = []
+      for node in cluster['nodes']:
+        nodeinfo = (node['ipmi_mac'], node['ipmi_ip'], node['host_ip'],
+          node['cvm_ip'], node['host_name'], node['position'])
+        nodeinfo_list.append(nodeinfo)
+      return nodeinfo_list
+    self.nodeinfo_list = get_nodeinfo_list(cluster)
 
   def connect_to_fvm(self):
     print('Foundation-01 : Connecting to Foundation VM.')
@@ -32,7 +46,7 @@ class FoundationOps:
     print('  password : {}'.format(fvm_password))
     self.client = NutanixFoundationClient(fvm_ip, fvm_user, fvm_password, logger)
 
-  def check_ipmi_mac_ip(self):   
+  def check_ipmi_mac(self):   
     print('Foundation-02 : Check IPMI MAC and IPMI address are OK.')
     problems = []
     for node in self.cluster['nodes']:
@@ -47,28 +61,37 @@ class FoundationOps:
         problems.append("Node-{}: IPMI MAC({}) doesn't exist on the segment".format(position, ipmi_mac))
       else:
         text = '    Success. IPMI MAC address "{}" exists on the segment.\n'.format(ipmi_mac)
-      
-      # IP address check
-      ipmi_ip = node['ipmi_ip']
-      result = self.client.get_mac_from_ip(ipmi_ip)
-      if result == '':
-        text += '    Success. IPMI IP address "{}" does not exist.'.format(ipmi_ip)
-      elif result == ipmi_mac:
-        text += '    Success. IPMI already has IP address "{}".'.format(ipmi_ip)
-      else:
-        # someone uses same ip. abort.
-        text += '    Failed. IPMI IP address "{}" is already used by another MAC Address "{}". Abort after all check finished.'.format(ipmi_ip, result)
-        problems.append("Node-{}: IPMI IP({}) is already used by another machine".format(position, ipmi_ip))
       print(text)
 
     if len(problems) != 0:
       raise ErrorException('\n'.join(problems))
 
-    print('  Success for all checks.')
+  def check_ipmi_ip(self):
+    print('Foundation-02 : Check IPMI IP has no conflict.')
+    problems = []
+    for node in self.cluster['nodes']:
+      position = node['position'].upper()
+      print('  Checking Node_{}'.format(position))
+      
+      # IP address check
+      ipmi_mac = node['ipmi_mac']
+      ipmi_ip = node['ipmi_ip']
+      result = self.client.get_mac_from_ip(ipmi_ip)
+      if result == '':
+        text = '    Success. IPMI IP address "{}" does not exist.'.format(ipmi_ip)
+      elif result == ipmi_mac:
+        text = '    Success. IPMI already has IP address "{}".'.format(ipmi_ip)
+      else:
+        # someone uses same ip. abort.
+        text = '    Failed. IPMI IP address "{}" is already used by another MAC Address "{}". Abort after all check finished.'.format(ipmi_ip, result)
+        problems.append("Node-{}: IPMI IP({}) is already used by another machine".format(position, ipmi_ip))
+      print(text)
+    if len(problems) != 0:
+      raise ErrorException('\n'.join(problems))
 
   def check_fvm_isnot_imaging(self):
     print('Foundation-03 : Check currently imaging or not.')
-    (success, result) = client.get_progress()
+    (success, result) = self.client.get_progress()
     if not success:
       print('  Failed with error "{}"'.format(response['error']))
       raise ErrorException('Failed to get Foundation VM progress.')
@@ -81,20 +104,21 @@ class FoundationOps:
 
   def check_fvm_has_nos_package(self):
     print('Foundation-04 : Check whether foundation vm has nos_package or not.')
-    (success, nos_packages) = client.get_nos_packages()
+    (success, nos_packages) = self.client.get_nos_packages()
     if not success:
       print('  Failed with error "{}"'.format(response['error']))
       raise ErrorException('Failed to get AOS package list.')
 
-    if nos_package in nos_packages:
-      print('  Foundation VM has nos_package "{}"'.format(nos_package))
+    if self.nos_package in nos_packages:
+      print('  Foundation VM has nos_package "{}"'.format(self.nos_package))
     else:
-      print('  Foundation VM does not have nos_package "{}". But having "{}". Abort.'.format(nos_package, nos_packages))
-      raise ErrorException("Foundation VM doesn't have nos_package '{}'".format(nos_package))
+      print('  Foundation VM does not have nos_package "{}". But having "{}". Abort.'.format(
+        self.nos_package, nos_packages))
+      raise ErrorException("Foundation VM doesn't have nos_package '{}'".format(self.nos_package))
 
-  def set_foundation_setting(self):
+  def set_foundation_settings(self):
     print('Foundation-05 : Reset Foundation VM')
-    (success, result) = client.reset_state()
+    (success, result) = self.client.reset_state()
     if success:
       print('  Success')
     else:
@@ -102,7 +126,7 @@ class FoundationOps:
       raise ErrorException("Failed to reset foundation state.")
 
     print('Foundation-06 : Choose primary nic to "eth0"')
-    (success, nics) = client.get_nics()
+    (success, nics) = self.client.get_nics()
     if not success:
       print('  Failed. Unable to get nic list.')
       raise ErrorException("Failed to get nic list")
@@ -114,7 +138,7 @@ class FoundationOps:
     if primary_nic == '':
       print('  Failed. Unable to find "eth0".')
       raise ErrorException('Failed to find nic "eth0" on nic list')
-    (success, result) = client.choose_primary_nic(primary_nic)
+    (success, result) = self.client.choose_primary_nic(primary_nic)
     if success:
       print('  Success')
     else:
@@ -123,8 +147,9 @@ class FoundationOps:
 
   def configure_ipmi_ip(self):
     print('Foundation-07 : Configure IPMI IP. May take few minutes.')
-    (success, result) = client.ipmi_config(netmask, gateway, nodeinfo_list,
-      cluster_name, external_ip, name_server, ntp_server, nos_package)
+    (success, result) = self.client.ipmi_config(
+      self.netmask, self.gateway, self.nodeinfo_list, self.cluster_name, 
+      self.external_ip, self.name_server, self.ntp_server, self.nos_package)
     if success:
       print('  Success')
     else:
@@ -133,8 +158,9 @@ class FoundationOps:
 
   def pre_check(self):
     print('Foundation-08 : Pre Check. May take few minutes.')
-    (success, result) = client.pre_check(netmask, gateway, nodeinfo_list,
-      cluster_name, external_ip, name_server, ntp_server, nos_package)
+    (success, result) = self.client.pre_check(
+      self.netmask, self.gateway, self.nodeinfo_list, self.cluster_name, 
+      self.external_ip, self.name_server, self.ntp_server, self.nos_package)
     if success:
       print('  Success')
     else:
@@ -143,8 +169,9 @@ class FoundationOps:
 
   def start_foundation(self):
     print('Foundation-09 : Kicking imaging nodes.')
-    (success, result) = client.image_nodes(netmask, gateway, nodeinfo_list,
-      cluster_name, external_ip, name_server, ntp_server, nos_package)
+    (success, result) = self.client.image_nodes(
+      self.netmask, self.gateway, self.nodeinfo_list, self.cluster_name, 
+      self.external_ip, self.name_server, self.ntp_server, self.nos_package)
     if success:
       print('  Success')
     else:
@@ -152,110 +179,60 @@ class FoundationOps:
       raise ErrorException('Failed to kick imaging nodes.')
 
   def get_foundation_progress(self):
-    (success, result) = client.get_progress()
-    if success:
-      for node in result['nodes']:
-        node_ip = node['hypervisor_ip']
-        node_percent = node['percent_complete']
-        node_status = node['status']
-        print('node({}) {}% : {}'.format(node_ip, node_percent, node_status))
+    (success, result) = self.client.get_progress()
+    if not success:
+      return (False, 0)
 
-      cluster_name = result['clusters'][0]['cluster_name']
-      cluster_percent = result['clusters'][0]['percent_complete']
-      cluster_status = result['clusters'][0]['status']
-      print('cluster({}) {}% : {}'.format(cluster_name, cluster_percent, cluster_status))
-      aggregate_percent = result['aggregate_percent_complete']
-      print('aggregate {}%'.format(aggregate_percent))
+    '''
+    print(result)
 
-      if aggregate_percent == 100:
-        time.sleep(3)
-        break
-      else:
-        if result['abort_session'] == True:
-          print('  Failed. Imaging was aborted.')
-          exit(-1)
-        elif result['imaging_stopped'] == True:
-          print('  Failed. Imaging was stopped.')
-          raise ErrorException('Failed. Imaging was stopped.')
+    for node in result['nodes']:
+      node_ip = node['hypervisor_ip']
+      node_percent = node['percent_complete']
+      node_status = node['status']
+      print('node({}) {}% : {}'.format(node_ip, node_percent, node_status))
 
-      print('=== waiting 15 secs ===')
-      time.sleep(15)
-      error_counter = 0
-
-    else:
-      # failed to get status
-      print('  Failed to getting progress. Try again soon.')
-      time.sleep(3)
-      error_counter += 1
-      if error_counter >= 5:
-        print('  Failed to getting progress 5 times sequentially. Abort.')
-        raise ErrorException('Failed to getting progress 5 times sequentially.')
-
-
-  def _get_nodeinfo_list(self, cluster):
-    nodeinfo_list = []
-    for node in cluster['nodes']:
-      nodeinfo = (node['ipmi_mac'], node['ipmi_ip'], node['host_ip'],
-        node['cvm_ip'], node['host_name'], node['position'])
-      nodeinfo_list.append(nodeinfo)
-    return nodeinfo_list
-
-  ###
-  ### Foundation
-  ###
-
-  '''
-  def foundation(self, cluster, nos_package):
-
-    netmask = cluster['netmask']
-    gateway = cluster['gateway']
-    nodeinfo_list = self.get_nodeinfo_list(cluster)
-    cluster_name = cluster['name']
-    external_ip = cluster['external_ip']
-    name_server = cluster['name_server']
-    ntp_server = cluster['ntp_server']
-
-    print('Foundation Start!!')
-
-    logger = NutanixRestApiClient.create_logger('foundation_rest.log', logging.DEBUG)
-    try:
-      foundation_vm = cluster['foundation_vms']
-      fvm_ip = foundation_vm['ip_addresses'][0]
-      fvm_user = foundation_vm['user']
-      fvm_password = foundation_vm['password']
-      print('  ip : {}'.format(fvm_ip))
-      print('  user : {}'.format(fvm_user))
-      print('  password : {}'.format(fvm_password))
-      client = NutanixFoundationClient(fvm_ip, fvm_user, fvm_password, logger)
-      (success, fvm_version) = client.get_version()
-      if not success:
-        raise Exception()
-      print('  Success. Foundation VM version "{}"'.format(fvm_version))
-    except:
-      print('  Failed with error "Unable to make session."'.format(fvm_ip, fvm_user, fvm_password))
-      raise ErrorException('Failed to make session to foundation vm "{}"'.format(fvm_ip))
-
-
-    self.check_ipmi_mac_ip(client, cluster)
+    cluster_name = result['clusters'][0]['cluster_name']
+    cluster_percent = result['clusters'][0]['percent_complete']
+    cluster_status = result['clusters'][0]['status']
+    print('cluster({}) {}% : {}'.format(cluster_name, cluster_percent, cluster_status))
+    
+    print('aggregate {}%'.format(aggregate_percent))
     '''
 
+    aggregate_percent = result['aggregate_percent_complete']
+    print('Foundation progress: {}'.format(aggregate_percent))
+    if aggregate_percent == 100:
+      return (True, 100)
+    else:
+      if 'abort_session' in result:
+        if result['abort_session'] == True:
+          print('  Failed. Imaging was aborted.')
+          raise ErrorException('Failed. Imaging was aborted.')
+      elif result['imaging_stopped'] == True:
+        print('  Failed. Imaging was stopped.')
+        raise ErrorException('Failed. Imaging was stopped.')
 
-
-
-
-
+    return (True, aggregate_percent)
 
 
 
 class EulaOps:
 
   def __init__(self, cluster):
-    self.cluster = cluster
+    self.INITIAL_PASSWORD = 'nutanix/4u'
+    self.TEMPORARY_PASSWORD = 'SREs4eva!'
 
-  def set_initial_password():
+    self.cluster = cluster
+    self.prism_ip = cluster['external_ip']
+    self.prism_user = cluster['prism_user']
+    self.prism_password = cluster['prism_password']
+
+  def set_initial_password(self):
     print('Eula Start!!')
-    print('Eula-1 : Initialize Prism password to temporary one "{}"'.format(TEMPORARY_PASSWORD))
-    (success, result) = NutanixRestApiClient.change_default_system_password(prism_ip, INITIAL_PASSWORD, TEMPORARY_PASSWORD)
+    print('Eula-1 : Initialize Prism password to temporary one "{}"'.format(self.TEMPORARY_PASSWORD))
+    (success, result) = NutanixRestApiClient.change_default_system_password(
+      self.prism_ip, self.INITIAL_PASSWORD, self.TEMPORARY_PASSWORD)
     if success:
       print('  Success')
     else:
@@ -266,7 +243,7 @@ class EulaOps:
     print('Eula-2 : Make session to Prism')
     logger = NutanixRestApiClient.create_logger('setup_cluster_rest.log', logging.DEBUG)
     try:
-      self.session = NutanixRestApiClient(prism_ip, prism_user, TEMPORARY_PASSWORD, logger)
+      self.session = NutanixRestApiClient(self.prism_ip, self.prism_user, self.TEMPORARY_PASSWORD, logger)
       print('  Success')
     except:
       print('  Failed with error "Connection or Credential problem"')
@@ -274,7 +251,7 @@ class EulaOps:
 
   def set_initial_settings(self):
     print('Eula-3 : Set Eula (User:Yuichi, Company:Nutanix, Position:Inside SE)')
-    (success, result) = session.set_eula('Yuichi', 'Nutanix', 'Inside SE')
+    (success, result) = self.session.set_eula('Yuichi', 'Nutanix', 'Inside SE')
     if success:
       print('  Success')
     else:
@@ -282,7 +259,7 @@ class EulaOps:
       raise ErrorException('Failed to set Eula.')
 
     print('Eula-4 : Set initial pulse settings.')
-    (success, result) = session.set_initial_pulse()
+    (success, result) = self.session.set_initial_pulse()
     if success:
       print('  Success')
     else:
@@ -290,33 +267,24 @@ class EulaOps:
       raise ErrorException('Failed to set initial pulse setting.')
 
     print('Eula-5 : Set initial alert settings.')
-    (success, result) = session.set_initial_alerts()
+    (success, result) = self.session.set_initial_alerts()
     if success:
       print('  Success')
     else:
       print('  Failed with error "{}"'.format(response['error']))
       raise ErrorException('Failed to set alert settings.')
 
-    print('Eula-6 : Change password to "{}"'.format(password))
-    if password == TEMPORARY_PASSWORD:
+    print('Eula-6 : Change password to "{}"'.format(self.prism_password))
+    if self.prism_password == self.TEMPORARY_PASSWORD:
       print('  Same password. Skip.')
     else:
-      (success, result) = session.change_password(TEMPORARY_PASSWORD, password)
+      (success, result) = self.session.change_password(self.TEMPORARY_PASSWORD, self.prism_password)
       if success:
         print('  Success')
       else:
         print('  Failed with error "{}"'.format(response['error']))
         raise ErrorException('Failed to change password.')
 
-
-  '''
-  def eula(self, cluster):
-    prism_ip = cluster['external_ip']
-    prism_user = cluster['prism_user']
-    password = cluster['prism_password']
-
-    print('Eula Finished!!')
-  '''
 
   ###
   ### SETUP
@@ -327,20 +295,22 @@ class SetupOps:
   def __init__(self, cluster):
     self.cluster = cluster
 
-    prism_ip = cluster['external_ip']
-    prism_user = cluster['prism_user']
-    prism_password = cluster['prism_password']
-    print('Setup-1 : Make session to Prism.')
-    logger = NutanixRestApiClient.create_logger('setup_cluster_rest.log', logging.DEBUG)
-    print('  ip : {}'.format(prism_ip))
-    print('  user : {}'.format(prism_user))
-    print('  password : {}'.format(prism_password))
-    self.session = NutanixRestApiClient(prism_ip, prism_user, prism_password, logger)
-    print('  Success')
+    self.prism_ip = cluster['external_ip']
+    self.prism_user = cluster['prism_user']
+    self.prism_password = cluster['prism_password']
 
+  def connect_to_prism(self):
+    print('Eula-2 : Make session to Prism')
+    logger = NutanixRestApiClient.create_logger('setup_cluster_rest.log', logging.DEBUG)
+    try:
+      self.session = NutanixRestApiClient(self.prism_ip, self.prism_user, self.prism_password, logger)
+      print('  Success')
+    except:
+      print('  Failed with error "Connection or Credential problem"')
+      raise ErrorException('Failed to make connection to Prism.')
 
   def setup_basics(self):
-    basics = cluster['basics']
+    basics = self.cluster['basics']
     language = basics['language']
 
     print('  Change language to "{}"'.format(language))
@@ -350,7 +320,7 @@ class SetupOps:
       print('    Failed. supports only {}'.format(['en-US', 'ja-JP', 'zh-CN']))
       raise ErrorException('Failed. Unsupported language "{}".'.format(lmap[language]))
 
-    (success, result) = session.change_language(lmap[language])
+    (success, result) = self.session.change_language(lmap[language])
     if success:
       print('    Success')
     else:
@@ -358,11 +328,11 @@ class SetupOps:
       raise ErrorException('Failed to change language.')
 
 
-  def setup_container(self):
-    containers = cluster['containers']
+  def setup_containers(self):
+    containers = self.cluster['containers']
 
     # get existing containers
-    (success, existing_containers) = session.get_container_names()
+    (success, existing_containers) = self.session.get_container_names()
     if not success:
       raise Exception('Error happens on getting existing container names.')
     print('  Existing containers "{}"'.format(existing_containers))
@@ -371,13 +341,13 @@ class SetupOps:
     for existing_container in existing_containers:
       if existing_container in containers:
         continue
-      (success, container_info) = session.get_container_info(existing_container)
+      (success, container_info) = self.session.get_container_info(existing_container)
       if not success:
         raise Exception('Error happens on getting container info "{}".'.format(existing_container))
       if container_info['usage'] != '0':
         continue
       print('  Deleting useless container "{}"'.format(existing_container))
-      (success, _) = session.delete_container(existing_container)
+      (success, _) = self.session.delete_container(existing_container)
       if not success:
         raise Exception('Error happens on deleting container "{}".'.format(existing_container))  
 
@@ -387,17 +357,17 @@ class SetupOps:
       if container in existing_containers:
         continue
       print('  Creating container "{}"'.format(container))
-      (success, taskuuid) = session.create_container(container)
+      (success, taskuuid) = self.session.create_container(container)
       if not success:
         raise Exception('Error happens on creating container "{}".'.format(container))
       task_list.append(taskuuid)
 
     # wait till end
-    wait_tasks(session, task_list)
+    self.wait_tasks(task_list)
 
-  def setup_network(self):
+  def setup_networks(self):
     networks = []
-    for (name, config_network) in cluster['networks'].items():
+    for (name, config_network) in self.cluster['networks'].items():
       if not config_network['use_dhcp']:
         networks.append((name, config_network['vlan']))
         continue
@@ -416,7 +386,7 @@ class SetupOps:
         pools.append((config_from, config_to))
       networks.append((network, prefix, gateway, dns, pools))
 
-    (success, existing_networks) = session.get_network_names()
+    (success, existing_networks) = self.session.get_network_names()
     if not success:
       raise Exception('Error happens on getting existing networks.')
     print('  Existing networks "{}"'.format(existing_networks))
@@ -429,19 +399,19 @@ class SetupOps:
     for existing_network in existing_networks:
       if existing_network in network_names:
         continue
-      (success, used) = session.is_network_used(existing_network)
+      (success, used) = self.session.is_network_used(existing_network)
       if not success:
         raise Exception('Error happens on getting existing networks.')
       if used:
         continue
 
       print('  Deleting useless network "{}"'.format(existing_network))
-      (success, taskuuid) = session.delete_network(existing_network)
+      (success, taskuuid) = self.session.delete_network(existing_network)
       if not success:
         raise Exception('Error happens on getting existing networks.')
 
     # Hypervisor
-    (success, hypervisor) = session.get_hypervisor()
+    (success, hypervisor) = self.session.get_hypervisor()
     if not success:
       raise Exception('Error happens on getting hypervisor.')
 
@@ -455,37 +425,37 @@ class SetupOps:
       print('  Creating network "{}"'.format(name))
       if len(network) == 2:
         (name, vlan) = network
-        (success, taskuuid) = session.create_network(name, vlan)
+        (success, taskuuid) = self.session.create_network(name, vlan)
         if not success:
           raise Exception('Error happens on creating network "{}"'.format(name))
       else:
         (ip, vlan, network, prefix, gateway, dns, pools) = network
         if hypervisor != 'AHV':
-          (success, taskuuid) = session.create_network(name, vlan)
+          (success, taskuuid) = self.session.create_network(name, vlan)
           if not success:
             raise Exception('Error happens on creating network "{}"'.format(name))
         else:
-          (success, taskuuid) = session.create_network_managed(name, vlan, network, prefix, gateway, pools, dns)
+          (success, taskuuid) = self.session.create_network_managed(name, vlan, network, prefix, gateway, pools, dns)
           if not success:
             raise Exception('Error happens on creating network "{}"'.format(name))
 
       task_list.append(taskuuid)
 
     # wait till end
-    wait_tasks(session, task_list)
+    self.wait_tasks(task_list)
 
-  def setup_image(session, images):
+  def setup_images(self):
     images = []
-    for (name, config_image) in cluster['images'].items():
+    for (name, config_image) in self.cluster['images'].items():
       images.append((name, config_image['container'], config_image['url']))
 
     # check whether container exist or not
-    (success, containers) = session.get_container_names()
+    (success, containers) = self.session.get_container_names()
     if not success:
       raise Exception('Error happens on checking container existance.')
 
     # get existing images
-    (success, existing_images) = session.get_image_names()
+    (success, existing_images) = self.session.get_image_names()
     if not success:
       raise Exception('Error happens on getting existing images names.')
     print('  Existing images "{}"'.format(existing_images))
@@ -497,21 +467,21 @@ class SetupOps:
         continue
       if image_container not in containers:
         print('  Failed. container "{}" does not exist on the cluster.'.format(image_container))
-        exit(-1)
+        raise Exception('Error happens on uploading image.')
 
       print('  Request uploading {} : {}'.format(image_name, image_url))
-      (success, taskuuid) = session.upload_image(image_url, image_container, image_name)
+      (success, taskuuid) = self.session.upload_image(image_url, image_container, image_name)
       if not success:
         raise Exception('Error happens on uploading image.')
       task_list.append(taskuuid)
 
     # wait till end
-    wait_tasks(session, task_list)
+    #self.wait_tasks(task_list)
 
-  def _wait_tasks(self, uuids, interval=5):
+  def wait_tasks(self, uuids, interval=5):
     first = True
     while(True):
-      (success, tasks) = session.get_tasks_status()
+      (success, tasks) = self.session.get_tasks_status()
       if not success:
         print(tasks)
         continue

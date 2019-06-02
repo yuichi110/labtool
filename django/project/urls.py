@@ -31,8 +31,7 @@ urlpatterns = [
 
     path('api/cluster_status/<str:uuid>', ClusterApi.cluster_status),
 
-    path('api/operations/foundation', OperationApi.foundation),
-    path('api/operations/foundation/', OperationApi.foundation),
+    path('api/operations/foundation/<str:uuid>', OperationApi.foundation),
     path('api/operations/start/<str:uuid>', OperationApi.start),
     path('api/operations/stop/<str:uuid>', OperationApi.stop),
 

@@ -83,12 +83,11 @@ def test_foundation(cluster_name, aos_image):
       continue
     uuid = cluster['uuid']
     d = {
-      'cluster_uuid' : uuid,
       'aos_image' : aos_image,
       'hypervisor_type' : 'ahv'
     }
     request_body = json.dumps(d, indent=2)
-    response = requests.post('http://127.0.0.1:8000/api/operations/foundation', data=request_body)
+    response = requests.post('http://127.0.0.1:8000/api/operations/foundation/{}'.format(uuid), data=request_body)
 
 def test_start(cluster_name):
   response = requests.get('http://127.0.0.1:8000/api/clusters')
@@ -119,7 +118,7 @@ def test_stop(cluster_name):
   response = requests.post('http://127.0.0.1:8000/api/operations/stop/{}'.format(uuid))
 
 if __name__ == '__main__':
-  #test_foundation('poc10', 'nutanix_installer_package-release-euphrates-5.5.7-stable.tar')
+  test_foundation('poc10', 'nutanix_installer_package-release-euphrates-5.5.7-stable.tar')
   #test_start('poc10')
-  test_stop('poc10')
+  #test_stop('poc10')
   

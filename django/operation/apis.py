@@ -70,7 +70,7 @@ class OperationApi:
 
 
   @classmethod
-  def foundation(cls, request):
+  def foundation(cls, request, uuid):
     if request.method not in ['POST']:
       response_body = json.dumps({'error':"unsupported method : '{}'".format(request.method)}, indent=2)
       return HttpResponseBadRequest(response_body, content_type='application/json')
@@ -78,7 +78,6 @@ class OperationApi:
     try:
       json_text = request.body.decode()
       d = json.loads(json_text)
-      cluster_uuid = d['cluster_uuid']
       aos_image = d['aos_image']
       hypervisor_type = d['hypervisor_type']
       if hypervisor_type != 'ahv':
@@ -90,7 +89,7 @@ class OperationApi:
       return HttpResponseBadRequest(response_body, content_type='application/json')
 
     try:
-      UUID(cluster_uuid, version=4)
+      UUID(uuid, version=4)
     except:
       response_body = json.dumps({'error':"incorrect uuid format"}, indent=2)
       return HttpResponseBadRequest(response_body, content_type='application/json')
@@ -99,18 +98,21 @@ class OperationApi:
       response_body = json.dumps({'error':"unsupported hypervisor type"}, indent=2)
       return HttpResponseBadRequest(response_body, content_type='application/json')
 
-    clusters = Cluster.objects.filter(uuid=cluster_uuid)
-    if len(clusters) == 0:
+    try:
+      cluster = Cluster.objects.get(uuid=uuid)
+    except:
       response_body = json.dumps({'error':'cluster object not found'}, indent=2)
       return HttpResponseNotFound(response_body, content_type='application/json')
 
-    task = Task.objects.create(name='foundation task for cluster', data='{}')
+    cluster_dict = cluster.data()
+    task = Task.objects.create(name='Foundation {}'.format(cluster_dict['name']), data='{}')
     try:
-      ftask = FoundationTask(str(task.uuid), clusters[0].data(),
+      ftask = FoundationTask(str(task.uuid), cluster_dict,
        aos_image, hypervisor_type, hypervisor_image)
       ftask.daemon = True
     except:
       task.is_complete = True
+      task.save()
       
     ftask.start()
 
