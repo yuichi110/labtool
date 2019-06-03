@@ -7,9 +7,9 @@
     <table class="table table-borderless" style="margin-top: auto; margin-bottom: auto;">
       <thead>
         <tr>
+          <th scope="col">Task Name</th>
           <th scope="col">Created At</th>
           <th scope="col">Updated At</th>
-          <th scope="col">Task Name</th>
           <th scope="col">Status</th>
         </tr>
       </thead>
@@ -19,9 +19,9 @@
           v-for="task in $store.state.tasks"
           :key="task.uuid"
         >
+          <td>{{ task.name }}</td>
           <td>{{ task.creation_time }}</td>
           <td>{{ task.update_time }}</td>
-          <td>{{ task.name }}</td>
           <td><pre style="text-align:left">{{ task.status }}</pre></td>
         </tr>
       </tbody>
@@ -42,9 +42,23 @@ export default {
 
   data () {
     return {
-      message: 'Welcome to Your Vue.js App'
+      intervalId: null,
     }
-  }
+  },
+
+  methods: {
+    forceReRender: function(){
+      this.$forceUpdate()
+    }
+  },
+
+  mounted: function(){
+    this.intervalId = setInterval(this.forceReRender, 15 * 1000)
+  },
+
+  beforeDestroy: function(){
+    clearInterval(this.intervalId)
+  },
 }
 </script>
 

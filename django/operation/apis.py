@@ -3,14 +3,45 @@ from django.core.serializers import serialize
 
 from rest_framework import generics
 from cluster.models import Cluster
+from playbook.models import Playbook
 from task.models import Task
 
 from uuid import UUID
 import json
 
-from background_tasks import FoundationTask, ClusterStopTask, ClusterStartTask
+from background_tasks import FoundationTask, ClusterStopTask, ClusterStartTask, AnsibleTask
 
 class OperationApi:
+
+  @classmethod
+  def run_playbook(cls, request, uuid):
+    if request.method not in ['POST']:
+      response_body = json.dumps({'error':"unsupported method : '{}'".format(request.method)}, indent=2)
+      return HttpResponseBadRequest(response_body, content_type='application/json')
+
+    try:
+      playbook = Playbook.objects.get(uuid=uuid)
+    except Exception as e:
+      response_body = json.dumps({'error':'playbook object not found'}, indent=2)
+      return HttpResponseNotFound(response_body, content_type='application/json')
+
+    try:
+      json_text = request.body.decode()
+      d = json.loads(json_text)
+      hosts = d['hosts']
+      user = d['user']
+      password = d['password']
+    except:
+      response_body = json.dumps({'error':"request body has problem"}, indent=2)
+      return HttpResponseBadRequest(response_body, content_type='application/json')
+
+    task = Task.objects.create(name='Run playbook {}'.format(playbook.name), data='')
+    ansible_task = AnsibleTask(str(task.uuid), hosts, user, password, playbook.body)
+    ansible_task.daemon = True
+    ansible_task.start()
+
+    response_body = json.dumps({'uuid':str(task.uuid)}, indent=2)
+    return HttpResponse(response_body, content_type='application/json')
 
   @classmethod
   def start(cls, request, uuid):

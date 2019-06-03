@@ -174,12 +174,12 @@ export default {
       axios.post('/api/operations/start/' + uuid)
       .then((response) => {
         console.log(response)
+        this.$store.dispatch('task_success')
       })
       .catch((error) => {
         console.log(error)
+        this.$store.dispatch('task_fail')
       })
-
-      this.$store.dispatch('task_start')
     },
 
     stop_clicked: function(uuid){
@@ -192,13 +192,14 @@ export default {
       axios.post('/api/operations/stop/' + this.selected_cluster)
       .then((response) => {
         console.log(response)
+        this.$store.dispatch('task_success')
       })
       .catch((error) => {
         console.log(error)
+        this.$store.dispatch('task_fail')
       })
 
-      $bvModal.hide('cluster-stop-modal')
-      this.$store.dispatch('task_start')
+      this.$bvModal.hide('cluster-stop-modal')
     },
 
     foundation_clicked: function(uuid){
@@ -232,7 +233,7 @@ export default {
       console.log(this.selected_aos_version)
       console.log(this.selected_hypervisor)
 
-      axios.post('/api/operations/foundation', {
+      axios.post('/api/operations/foundation/' + this.selected_cluster, {
         cluster_uuid: this.selected_cluster,
         aos_image: this.selected_aos_version,
         hypervisor_type: 'ahv',
@@ -240,13 +241,15 @@ export default {
       })
       .then((response) => {
         console.log(response)
+        this.$store.dispatch('task_success')
       })
       .catch((error) => {
         console.log(error)
+        this.$store.dispatch('task_fail')
       })
 
-      $bvModal.hide('cluster-foundation-modal')
-      this.$store.dispatch('task_start')
+      this.$bvModal.hide('cluster-foundation-modal')
+      
     }
   },
 

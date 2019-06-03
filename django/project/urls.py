@@ -5,6 +5,7 @@ from cluster.views import IndexView
 from asset.apis import AssetApi
 from segment.apis import SegmentApi
 from cluster.apis import ClusterApi
+from playbook.apis import PlaybookApi
 from operation.apis import OperationApi
 from task.apis import TaskApi
 
@@ -28,12 +29,15 @@ urlpatterns = [
     path('api/clusters', ClusterApi.clusters),
     path('api/clusters/', ClusterApi.clusters),
     path('api/clusters/<str:uuid>', ClusterApi.cluster),
-
     path('api/cluster_status/<str:uuid>', ClusterApi.cluster_status),
+
+    path('api/playbooks/', PlaybookApi.playbooks),
+    path('api/playbooks/<str:uuid>', PlaybookApi.playbook),
 
     path('api/operations/foundation/<str:uuid>', OperationApi.foundation),
     path('api/operations/start/<str:uuid>', OperationApi.start),
     path('api/operations/stop/<str:uuid>', OperationApi.stop),
+    path('api/operations/run_playbook/<str:uuid>', OperationApi.run_playbook),
 
     path('api/tasks', TaskApi.tasks),
     path('api/tasks/', TaskApi.tasks),

@@ -10,11 +10,15 @@
         <b-nav-item :to="{name:'ClusterListView'}">Clusters</b-nav-item>
         <b-nav-item :to="{name:'AssetListView'}">Assets</b-nav-item>
         <b-nav-item :to="{name:'SegmentListView'}">Segments</b-nav-item>
+        <b-nav-item :to="{name:'SegmentListView'}">Ansible</b-nav-item>
         <b-nav-item :to="{name:'TaskListView'}">
           Tasks
           <b-spinner 
-          v-if="$store.state.task_spinning"
+          v-if="$store.state.task_success"
           small variant="primary" label="Spinning"></b-spinner>
+          <b-spinner 
+          v-if="$store.state.task_fail"
+          small variant="danger" label="Spinning"></b-spinner>
         </b-nav-item>
       </b-navbar-nav>
 

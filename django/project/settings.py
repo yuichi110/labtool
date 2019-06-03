@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'asset',
     'segment',
     'cluster',
+    'playbook',
     'operation',
     'task',
     'static'

@@ -5,6 +5,8 @@ import requests
 import subprocess
 import paramiko
 import traceback
+import os
+import uuid
 
 from task.models import Task
 from nutanix_foundation import FoundationOps, EulaOps, SetupOps
@@ -22,6 +24,102 @@ def send_task_update(task_uuid, status, finished=False):
   }
   request_body = json.dumps(d, indent=2)
   response = requests.put(self_url, request_body)
+
+
+class AnsibleTask(threading.Thread):
+  def __init__(self, task_uuid, hosts, user, password, playbook_body):
+    threading.Thread.__init__(self)
+    self.task_uuid = task_uuid
+    self.hosts = hosts
+    self.user = user
+    self.password = password
+    self.playbook_body = playbook_body
+
+    self.step_ssh_copy_id = ''
+    self.step_inventory = ''
+    self.step_playbook = ''
+    self.step_run_playbook = ''
+
+  def ssh_copy_id(self):
+    for host in self.hosts:
+      command = 'echo "{}" | sshpass ssh-copy-id  -o StrictHostKeyChecking=no {}@{}'.format(self.password, self.user, host)
+      res_bytes = subprocess.check_output(command, shell=True)
+      res_string = res_bytes.decode('utf-8').strip()
+      print(res_string)
+
+  def ansible_playbook(self, inventory, playbook):
+    command = 'ansible-playbook -i {} {}'.format(inventory, playbook)
+    res_bytes = subprocess.check_output(command, shell=True)
+    return res_bytes.decode('utf-8').strip()
+
+  def make_playbook(self):
+    dirpath = './ansible_workspace'
+    filename = str(uuid.uuid4())
+    filepath = os.path.join(dirpath, filename)
+    os.makedirs(dirpath, exist_ok=True)
+    with open(filepath, 'w') as f:
+      f.write(self.playbook_body)
+    return filepath
+
+  def make_inventory(self):
+    dirpath = './ansible_workspace'
+    filename = str(uuid.uuid4())
+    filepath = os.path.join(dirpath, filename)
+    os.makedirs(dirpath, exist_ok=True)
+    with open(filepath, 'w') as f:
+      for host in self.hosts:
+        line = '{}\n'.format(host)
+        f.write(line)
+    return filepath
+
+  def status(self):
+    text = ''
+    text += 'Copy key via ssh-copy-id : {}\n'.format(self.step_ssh_copy_id)
+    text += 'Make inventory file      : {}\n'.format(self.step_inventory)
+    text += 'Make playbook file       : {}\n'.format(self.step_playbook)
+    text += 'Run playbook             : {}\n'.format(self.step_run_playbook)
+    return text
+
+  def run(self):
+    try:
+      self.step_ssh_copy_id = 'Running'
+      send_task_update(self.task_uuid, self.status())
+      self.ssh_copy_id()
+
+      self.step_ssh_copy_id = 'Done'
+      self.step_inventory = 'Running'
+      send_task_update(self.task_uuid, self.status())
+      inventory_path = self.make_inventory()
+      print(inventory_path)
+
+      self.step_inventory = 'Done'
+      self.step_playbook = 'Running'
+      send_task_update(self.task_uuid, self.status())
+      playbook_path = self.make_playbook()
+      print(playbook_path)
+
+      self.step_playbook = 'Done'
+      self.step_run_playbook = 'Running'
+      send_task_update(self.task_uuid, self.status())
+      output = self.ansible_playbook(inventory_path, playbook_path)
+      send_task_update(self.task_uuid, output)
+      
+      print(output)
+      os.remove(inventory_path)
+      os.remove(playbook_path)
+
+    except Exception as e:
+      print(e)
+      print()
+
+      text = self.status() + '\n'
+      text += traceback.format_exc()
+      send_task_update(self.task_uuid, text)
+      return
+
+    send_task_update(self.task_uuid, output, True)
+
+
 
 
 class FoundationTask(threading.Thread):

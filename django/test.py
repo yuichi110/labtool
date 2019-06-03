@@ -117,8 +117,55 @@ def test_stop(cluster_name):
 
   response = requests.post('http://127.0.0.1:8000/api/operations/stop/{}'.format(uuid))
 
+
+body_httpd = '''---
+- name: sample
+  hosts: all
+  remote_user: root
+  
+  tasks:
+
+    - name: latest httpd
+      yum:
+        name: httpd
+        state: latest
+'''
+
+def create_playbook(name, body):
+  d = {
+    'name':name,
+    'body':body,
+  }
+
+  request_body = json.dumps(d, indent=2)
+  response = requests.post('http://127.0.0.1:8000/api/playbooks/', request_body)
+
+
+def test_ansible(playbook_name, hosts, user, password):
+  response = requests.get('http://127.0.0.1:8000/api/playbooks/')
+  uuid = ''
+  for playbook in response.json():
+    if playbook['name'] != playbook_name:
+      continue
+    uuid = playbook['uuid']
+
+  if uuid == '':
+    print('Failed to find the cluster. Abort.')
+    exit()
+
+  d = {
+    'hosts':hosts,
+    'user':user,
+    'password':password
+  }
+  request_body = json.dumps(d, indent=2)
+  response = requests.post('http://127.0.0.1:8000/api/operations/run_playbook/{}'.format(uuid), request_body)
+
 if __name__ == '__main__':
-  test_foundation('poc10', 'nutanix_installer_package-release-euphrates-5.5.7-stable.tar')
+  #test_foundation('poc10', 'nutanix_installer_package-release-euphrates-5.5.7-stable.tar')
   #test_start('poc10')
   #test_stop('poc10')
+  #create_playbook('httpd', body_httpd)
+  test_ansible('httpd', ['10.149.245.107', '10.149.245.108'], 'root', 'nutanix/4u')
+
   

@@ -11,7 +11,8 @@ export default new Vuex.Store({
     segments: [],
     tasks: [],
 
-    task_spinning: false,
+    task_success: false,
+    task_fail: false,
   },
 
   mutations: {
@@ -31,8 +32,12 @@ export default new Vuex.Store({
       state.tasks = data
     },
 
-    set_task_spinning(state, bool){
-      state.task_spinning = bool
+    set_task_success(state, bool){
+      state.task_success = bool
+    },
+
+    set_task_fail(state, bool){
+      state.task_fail = bool
     }
   },
 
@@ -77,13 +82,22 @@ export default new Vuex.Store({
       })
     },
 
-    task_start({ dispatch, commit, state }){
-      commit('set_task_spinning', true)
+    task_success({ dispatch, commit, state }){
+      commit('set_task_success', true)
       
       let fun = function(){
-        commit('set_task_spinning', false)
+        commit('set_task_success', false)
       }
-      setTimeout(fun, 2 * 1000)
+      setTimeout(fun, 1 * 1000)
+    },
+
+    task_fail({ dispatch, commit, state }){
+      commit('set_task_fail', true)
+      
+      let fun = function(){
+        commit('set_task_fail', false)
+      }
+      setTimeout(fun, 1 * 1000)
     }
   }
 })

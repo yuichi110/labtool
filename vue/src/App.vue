@@ -37,7 +37,7 @@ export default {
     setInterval(this.updateStatus, 60 * 1000)
 
     this.updateTasks()
-    setInterval(this.updateTasks, 15 * 1000)
+    setInterval(this.updateTasks, 10 * 1000)
   }
 }
 </script>
