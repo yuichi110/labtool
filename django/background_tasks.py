@@ -46,14 +46,14 @@ class AnsibleTask(threading.Thread):
       if host == '':
         continue
           
-      command = 'echo "{}" | sshpass ssh-copy-id  -o StrictHostKeyChecking=no {}@{}'.format(self.password, self.user, host)
-      res_bytes = subprocess.check_output(command, shell=True)
+      command = 'echo "{}" | sshpass ssh-copy-id  -o StrictHostKeyChecking=no -o ConnectTimeout=3 {}@{}'.format(self.password, self.user, host)
+      res_bytes = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
       res_string = res_bytes.decode('utf-8').strip()
       print(res_string)
 
   def ansible_playbook(self, inventory, playbook):
     command = 'ansible-playbook -i {} {}'.format(inventory, playbook)
-    res_bytes = subprocess.check_output(command, shell=True)
+    res_bytes = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
     return res_bytes.decode('utf-8').strip()
 
   def make_playbook(self):
@@ -120,7 +120,7 @@ class AnsibleTask(threading.Thread):
 
     except subprocess.CalledProcessError as exc:
       print(exc.output)
-      text = '{}\n\nFailed.\n\n{}'.format(self.status(), exc.output)
+      text = '{}\n\nFailed.\n\n{}'.format(self.status(), exc.output.decode('utf-8').strip())
       send_task_update(self.task_uuid, text, True)
       return
 

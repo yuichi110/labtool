@@ -4,7 +4,6 @@ import logging
 import time
 import os
 import traceback
-import pings
 import subprocess
 import paramiko
 from nutanix_restapi import NutanixFoundationClient, NutanixRestApiClient
@@ -482,11 +481,14 @@ class CheckStatusOps:
     return results
 
   def check_host_reachable(host_ips):
-    p = pings.Ping()
     results = {}
     for host_ip in host_ips:
-      res = p.ping(host_ip)
-      results[host_ip] = res.is_reached()
+      try:
+        command = 'ping {} -c 2 -W 2'.format(host_ip)
+        subprocess.check_output(command, shell=True)
+        results[host_ip] = True
+      except:
+        results[host_ip] = False
     return results
 
   def check_cluster_up(ip, user, password):

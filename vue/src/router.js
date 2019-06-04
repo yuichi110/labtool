@@ -10,20 +10,24 @@ import SegmentDetailView from '@/views/SegmentDetailView'
 import AnsibleView from '@/views/AnsibleView'
 import TaskListView from '@/views/TaskListView'
 
+const DEFAULT_TITLE = 'Founder';
+
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/',
       name: 'IndexView',
       component: IndexView,
+      meta: { title: 'Home' }
     },
 
     {
       path: '/clusters',
       name: 'ClusterListView',
       component: ClusterListView,
+      meta: { title: 'Clusters' }
     },
     {
       path: '/clusters/:uuid',
@@ -35,6 +39,7 @@ export default new Router({
       path: '/assets',
       name: 'AssetListView',
       component: AssetListView,
+      meta: { title: 'Assets' }
     },
     {
       path: '/assets/:uuid',
@@ -46,6 +51,7 @@ export default new Router({
       path: '/segments',
       name: 'SegmentListView',
       component: SegmentListView,
+      meta: { title: 'Segments' }
     },
     {
       path: '/segments/:uuid',
@@ -57,12 +63,24 @@ export default new Router({
       path: '/ansible',
       name: 'AnsibleView',
       component: AnsibleView,
+      meta: { title: 'Ansible' }
     },
 
     {
       path: '/tasks',
       name: 'TaskListView',
       component: TaskListView,
+      meta: { title: 'Tasks' }
     },
   ]
 })
+
+router.afterEach((to, from) => {
+  if(to.meta.title){
+    document.title = to.meta.title + ' | ' + DEFAULT_TITLE
+  }else{
+    document.title = DEFAULT_TITLE;
+  }
+});
+
+export default router
