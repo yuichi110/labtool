@@ -15,7 +15,8 @@ echo
 {
   cd django
   source venv/bin/activate
-  echo "$password" | sudo python manage.py runserver
+  #echo "$password" | sudo python manage.py runserver
+  python manage.py runserver
 } &
 sleep 5;
 

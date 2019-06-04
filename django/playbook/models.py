@@ -14,6 +14,10 @@ class Playbook(models.Model):
     d = {
       'uuid':str(self.uuid),
       'name':self.name,
-      'body':self.body
+      'body':self.body,
+
+      # for django vue select box
+      'value':str(self.uuid),
+      'text':self.name,
     }
     return d

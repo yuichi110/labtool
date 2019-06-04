@@ -7,7 +7,7 @@ import AssetListView from '@/views/AssetListView'
 import AssetDetailView from '@/views/AssetDetailView'
 import SegmentListView from '@/views/SegmentListView'
 import SegmentDetailView from '@/views/SegmentDetailView'
-
+import AnsibleView from '@/views/AnsibleView'
 import TaskListView from '@/views/TaskListView'
 
 Vue.use(Router)
@@ -52,6 +52,13 @@ export default new Router({
       name: 'SegmentDetailView',
       component: SegmentDetailView,
     },
+
+    {
+      path: '/ansible',
+      name: 'AnsibleView',
+      component: AnsibleView,
+    },
+
     {
       path: '/tasks',
       name: 'TaskListView',

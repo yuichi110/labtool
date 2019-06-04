@@ -9,6 +9,7 @@ export default new Vuex.Store({
     clusters: [],
     assets: [],
     segments: [],
+    playbooks: [],
     tasks: [],
 
     task_success: false,
@@ -26,6 +27,10 @@ export default new Vuex.Store({
 
     set_segments(state, data){
       state.segments = data
+    },
+
+    set_playbooks(state, data){
+      state.playbooks = data
     },
 
     set_tasks(state, data){
@@ -66,6 +71,16 @@ export default new Vuex.Store({
       return axios.get('/api/segments/')
       .then((response) => {
         commit('set_segments', response.data)
+      })
+      .catch((error) => {
+        console.log('Error: ' + error)
+      })
+    },
+
+    playbooks_get({ dispatch, commit, state }){
+      return axios.get('/api/playbooks/')
+      .then((response) => {
+        commit('set_playbooks', response.data)
       })
       .catch((error) => {
         console.log('Error: ' + error)

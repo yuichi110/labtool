@@ -35,8 +35,20 @@ class OperationApi:
       response_body = json.dumps({'error':"request body has problem"}, indent=2)
       return HttpResponseBadRequest(response_body, content_type='application/json')
 
+    playbook_header =  '---\n'
+    playbook_header += '- name: ' + playbook.name + '\n'
+    playbook_header += '  hosts: all\n'
+    playbook_header += '  remote_user: ' + user + '\n'
+    playbook_header += '  tasks:\n'
+
+    body_with_indent_list = ['  {}'.format(line) for line in playbook.body.split('\n')]
+    playbook_body = '\n'.join(body_with_indent_list)
+
+    playbook_content = playbook_header + playbook_body
+    print(playbook_content)
+
     task = Task.objects.create(name='Run playbook {}'.format(playbook.name), data='')
-    ansible_task = AnsibleTask(str(task.uuid), hosts, user, password, playbook.body)
+    ansible_task = AnsibleTask(str(task.uuid), hosts, user, password, playbook_content)
     ansible_task.daemon = True
     ansible_task.start()
 

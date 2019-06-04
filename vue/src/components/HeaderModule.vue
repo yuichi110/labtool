@@ -10,7 +10,7 @@
         <b-nav-item :to="{name:'ClusterListView'}">Clusters</b-nav-item>
         <b-nav-item :to="{name:'AssetListView'}">Assets</b-nav-item>
         <b-nav-item :to="{name:'SegmentListView'}">Segments</b-nav-item>
-        <b-nav-item :to="{name:'SegmentListView'}">Ansible</b-nav-item>
+        <b-nav-item :to="{name:'AnsibleView'}">Ansible</b-nav-item>
         <b-nav-item :to="{name:'TaskListView'}">
           Tasks
           <b-spinner 

@@ -42,6 +42,10 @@ class AnsibleTask(threading.Thread):
 
   def ssh_copy_id(self):
     for host in self.hosts:
+      host = host.strip()
+      if host == '':
+        continue
+          
       command = 'echo "{}" | sshpass ssh-copy-id  -o StrictHostKeyChecking=no {}@{}'.format(self.password, self.user, host)
       res_bytes = subprocess.check_output(command, shell=True)
       res_string = res_bytes.decode('utf-8').strip()
@@ -68,6 +72,9 @@ class AnsibleTask(threading.Thread):
     os.makedirs(dirpath, exist_ok=True)
     with open(filepath, 'w') as f:
       for host in self.hosts:
+        host = host.strip()
+        if host == '':
+          continue
         line = '{}\n'.format(host)
         f.write(line)
     return filepath
@@ -102,22 +109,28 @@ class AnsibleTask(threading.Thread):
       self.step_run_playbook = 'Running'
       send_task_update(self.task_uuid, self.status())
       output = self.ansible_playbook(inventory_path, playbook_path)
-      send_task_update(self.task_uuid, output)
-      
+
+      self.step_run_playbook = 'Done'
+      text = '{}\n\nSuccess.\n\n{}'.format(self.status(), output)
+      send_task_update(self.task_uuid, text)
+
       print(output)
       os.remove(inventory_path)
       os.remove(playbook_path)
 
-    except Exception as e:
-      print(e)
-      print()
-
-      text = self.status() + '\n'
-      text += traceback.format_exc()
-      send_task_update(self.task_uuid, text)
+    except subprocess.CalledProcessError as exc:
+      print(exc.output)
+      text = '{}\n\nFailed.\n\n{}'.format(self.status(), exc.output)
+      send_task_update(self.task_uuid, text, True)
       return
 
-    send_task_update(self.task_uuid, output, True)
+    except Exception as e:
+      print(traceback.format_exc())
+      text = '{}\n\nFailed.\n\n{}'.format(self.status(), traceback.format_exc())
+      send_task_update(self.task_uuid, text, True)
+      return
+
+    send_task_update(self.task_uuid, text, True)
 
 
 

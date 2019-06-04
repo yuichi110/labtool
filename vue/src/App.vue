@@ -25,6 +25,7 @@ export default {
       this.$store.dispatch('cluster_get')
       this.$store.dispatch('assets_get')
       this.$store.dispatch('segments_get')
+      this.$store.dispatch('playbooks_get')
     },
 
     updateTasks: function(){
