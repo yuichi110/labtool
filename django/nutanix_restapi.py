@@ -35,7 +35,7 @@ class NutanixFoundationClient:
     return logger
 
 
-  def __init__(self, ip, username, password, logger=None, timeout_connection=2, timeout_read=3600):
+  def __init__(self, ip, username, password, logger=None, timeout_connection=5, timeout_read=3600):
     TIMEOUT = (timeout_connection, timeout_read)
 
     # Test IP and Port reachability
@@ -461,7 +461,7 @@ class NutanixRestApiClient:
       error_dict['text'] = response.text
       return (False, error_dict)
 
-  def __init__(self, ip, username, password, logger=None, timeout_connection=2, timeout_read=5):
+  def __init__(self, ip, username, password, logger=None, timeout_connection=5, timeout_read=15):
     TIMEOUT = (timeout_connection, timeout_read)
 
     # Test IP and Port reachability

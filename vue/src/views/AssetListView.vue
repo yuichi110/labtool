@@ -1,16 +1,24 @@
 <template>
 <div>
   <b-container>
-
+    <h2>Assets</h2>
+    
     <div 
       v-for="asset in $store.state.assets"
       :key="asset.uuid"
       style="padding-bottom: 50px; text-align: left"
     >
       <h2>{{ asset.name }}</h2>
+      <p>UUID: {{ asset.uuid }}</p>
       <p>Prism User: {{ asset.prism_user }}</p>
       <p>Prism Password: {{ asset.prism_password }}</p>
       <p>Prism External IP: {{ asset.external_ip }}</p>
+      <p>Netmask: {{ asset.netmask }}</p>
+      <p>Gateway: {{ asset.gateway }}</p>
+      <p>Name Server: {{ asset.name_server }}</p>
+      <p>NTP Server: {{ asset.ntp_server }}</p>
+
+      <h4> - Nodes</h4>
       <table 
         class="table table-borderless" 
         style="margin-top: auto; margin-bottom: auto;"

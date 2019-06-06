@@ -1,16 +1,18 @@
 <template>
 <b-container>
   <nav class="navbar navbar-expand-lg navbar-light" style="margin-top: auto; margin-bottom: auto; height:">
-    <b-navbar-brand :to="{name:'ClusterListView'}">Founder</b-navbar-brand>
+    <b-navbar-brand :to="{name:'IndexView'}">Founder</b-navbar-brand>
 
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
+        <b-nav-item :to="{name:'IndexView'}">Home</b-nav-item>
+        <b-nav-item :to="{name:'AnsibleView'}">Run-Ansible</b-nav-item>
+
         <b-nav-item :to="{name:'ClusterListView'}">Clusters</b-nav-item>
         <b-nav-item :to="{name:'AssetListView'}">Assets</b-nav-item>
         <b-nav-item :to="{name:'SegmentListView'}">Segments</b-nav-item>
-        <b-nav-item :to="{name:'AnsibleView'}">Ansible</b-nav-item>
         <b-nav-item :to="{name:'TaskListView'}">
           Tasks
           <b-spinner 
