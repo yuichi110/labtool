@@ -7,14 +7,22 @@ import paramiko
 import traceback
 import os
 import uuid
+import sys
 
 from task.models import Task
 from nutanix_foundation import FoundationOps, EulaOps, SetupOps
 from nutanix_cluster import CheckStatusOps, ClusterStartOps, ClusterStopOps
 
-import django.core.management.commands.runserver as runserver
-cmd = runserver.Command()
-PORT = cmd.default_port
+try:
+  last_arg = sys.argv[-1]
+  words = last_arg.split(':')
+  PORT = int(words[1])
+except Exception as e:
+  print(e)
+  import django.core.management.commands.runserver as runserver
+  cmd = runserver.Command()
+  PORT = cmd.default_port
+print('Running on Port: {}'.format(PORT))
 
 def send_task_update(task_uuid, status, finished=False):
   self_url = 'http://127.0.0.1:{}/api/task_status/{}'.format(PORT, task_uuid)

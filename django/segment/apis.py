@@ -1,9 +1,6 @@
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 
-from rest_framework import generics
 from .models import Segment
-
-from background_task import background
 from uuid import UUID
 import json
 
@@ -119,18 +116,3 @@ class SegmentApi:
     else:
       response_body = json.dumps({'error':"unsupported method : '{}'".format(request.method)}, indent=2)
       return HttpResponseBadRequest(response_body, content_type='application/json')
-
-  @classmethod
-  def update_status(cls, request):
-    @background(queue='queue_name1', schedule=0)
-    def some_long_duration_process(some_param1, some_param2):
-      print('hello world')
-
-    return HttpResponse('{"status":"ok"}')
-
-  @classmethod
-  def test(cls, request):
-    some_long_duration_process('a', 'b')
-
-    response_body = json.dumps({'aaa':'bbb'}, indent=2)
-    return HttpResponse(response_body, content_type='application/json')

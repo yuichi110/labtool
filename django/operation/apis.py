@@ -1,7 +1,5 @@
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
-from django.core.serializers import serialize
 
-from rest_framework import generics
 from cluster.models import Cluster
 from playbook.models import Playbook
 from task.models import Task

@@ -1,12 +1,10 @@
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 
-from rest_framework import generics
 from .models import Cluster
 
 from asset.models import Asset
 from segment.models import Segment
 
-from background_task import background
 from uuid import UUID
 import json
 

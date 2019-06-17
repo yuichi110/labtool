@@ -1,9 +1,5 @@
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
-from django.core.serializers import serialize
 
-from rest_framework import generics
-
-from background_task import background
 from uuid import UUID
 import json
 from .models import Task
