@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'd=4g!^cqhhts*szzi)1x)+k2=x@bc0k6%2w@jzpgpeb9t0@dd7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -44,13 +44,13 @@ INSTALLED_APPS = [
     #'background_task',
 
     # my apps
+    'common',
     'asset',
     'segment',
     'cluster',
     'playbook',
     'operation',
     'task',
-    'static'
 ]
 
 MIDDLEWARE = [
@@ -58,6 +58,8 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
 
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     #'django.middleware.csrf.CsrfViewMiddleware',
@@ -121,25 +123,19 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-STATICFILES_DIRS = [
-    BASE_DIR,
-]
-
-STATIC_URL = '/view/'
-
 CORS_ORIGIN_WHITELIST = [
     '127.0.0.1:8080',
 ]
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
