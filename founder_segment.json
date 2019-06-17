@@ -1,0 +1,249 @@
+[
+  {
+    "name" : "main",
+    "description" : "10.149.<POC>.0 cluster at main segment 10.149.0.0/17",
+    "foundation_vms" : {
+        "ip_addresses" : [
+          "10.149.0.5"
+        ],
+      "user" : "nutanix",
+      "password" : "nutanix/4u",
+      "nos_packages" : {
+        "5.5.7" : "nutanix_installer_package-release-euphrates-5.5.7-stable.tar"
+      }
+    },
+    "basics":{
+      "language" : "ja-JP",
+      "nfs_whitelists" : [
+        "10.0.0.0,255.0.0.0"
+      ]
+    },
+    "containers" : [
+      "container", 
+      "NutanixManagementShare"
+    ],
+    "networks" : {
+      "net_10.149.0.0/17" : {
+        "use_dhcp" : false,
+        "vlan" : 0
+      }
+    },
+    "images" : {
+      "virtio_1.1.3" : {
+        "container" : "container",
+        "url" : "nfs://10.149.245.50/Public/labtool/iso/virtio_1.1.3.iso"
+      },
+      "iso_cent6_min" : {
+        "container" : "container",
+        "url" : "nfs://10.149.245.50/Public/labtool/iso/centos6_min.iso"
+      },
+      "iso_cent7_min" : {
+        "container" : "container",
+        "url" : "nfs://10.149.245.50/Public/labtool/iso/centos7_min.iso"
+      },
+      "iso_win2012r2_eng" : {
+        "container" : "container",
+        "url" : "nfs://10.149.245.50/Public/labtool/iso/winserv2012r2_eng.iso"
+      },
+      "img_foundation_4.3.1" : {
+        "container" : "container",
+        "url" : "nfs://10.149.245.50/Public/labtool/foundationvm/Foundation_VM-4.3.1-disk-0.qcow2"
+      },
+      "img_centos7_eng" : {
+        "container" : "container",
+        "url" : "nfs://10.149.245.50/Public/labtool/image/centos7_eng_raw"
+      },
+      "img_win2012r2_eng" : {
+        "container" : "container",
+        "url" : "nfs://10.149.245.50/Public/labtool/image/win2012r2_eng_raw"          
+      }
+    }
+  },
+
+  {
+    "name" : "training01",
+    "description" : "10.149.160.0 cluster at training segment 10.149.160.0/22",
+    "foundation_vms" : {
+        "ip_addresses" : [
+          "10.149.160.5"
+        ],
+        "user" : "nutanix",
+        "password" : "nutanix/4u",
+        "nos_packages" : {
+          "5.5.7" : "nutanix_installer_package-release-euphrates-5.5.7-stable.tar",
+          "5.10.1" : "nutanix_installer_package-release-euphrates-5.10.1-stable.tar"
+        }
+    },
+    "basics":{
+      "language" : "ja-JP",
+      "nfs_whitelists" : [
+        "10.0.0.0,255.0.0.0"
+      ]
+    },
+    "containers" : [
+      "container", 
+      "NutanixManagementShare"
+    ],
+    "networks" : {
+      "test_168" : {
+        "use_dhcp" : false,
+        "vlan" : 168
+      }
+    },
+    "images" : {
+      "ISO_CENT7_MIN" : {
+        "container" : "container",
+        "url" : "nfs://10.149.245.50/Public/bootcamp/centos7_min.iso"
+      },
+      "IMG_CENT7_JPN" : {
+        "container" : "container",
+        "url" : "nfs://10.149.245.50/Public/bootcamp/centos7_jpn_raw"
+      },
+      "IMG_CENT7_ENG" : {
+        "container" : "container",
+        "url" : "nfs://10.149.245.50/Public/bootcamp/centos7_eng_raw"
+      },
+      "IMG_WIN2012R2_ENG" : {
+        "container" : "container",
+        "url" : "nfs://10.149.245.50/Public/bootcamp/win2012r2_eng_raw"
+      }
+    },
+    "alias" : {
+      "external_ip":"10.149.160.41",
+      "netmask":"255.255.252.0",
+      "gateway":"10.149.160.1",
+      "ntp_server":"ntp.nict.jp",
+      "name_server":"8.8.8.8",
+      "prism_user":"admin",
+      "prism_password":"Nutanix/4u!",
+      "nodes":[
+        {
+          "host_name":"AHV-1",
+          "position":"A",
+          "ipmi_mac":"",
+          "ipmi_ip":"10.149.160.11",
+          "host_ip":"10.149.160.21",
+          "cvm_ip":"10.149.160.31"
+        },
+        {
+          "host_name":"AHV-2",
+          "position":"B",
+          "ipmi_mac":"",
+          "ipmi_ip":"10.149.160.12",
+          "host_ip":"10.149.160.22",
+          "cvm_ip":"10.149.160.32"
+        },
+        {
+          "host_name":"AHV-3",
+          "position":"C",
+          "ipmi_mac":"",
+          "ipmi_ip":"10.149.160.13",
+          "host_ip":"10.149.160.23",
+          "cvm_ip":"10.149.160.33"
+        },
+        {
+          "host_name":"AHV-4",
+          "position":"D",
+          "ipmi_mac":"",
+          "ipmi_ip":"10.149.160.14",
+          "host_ip":"10.149.160.24",
+          "cvm_ip":"10.149.160.34"
+        }
+      ]
+    }
+  },
+
+  {
+    "name" : "training02",
+    "description" : "10.149.161.0 cluster at training segment 10.149.160.0/22",
+    "foundation_vms" : {
+        "ip_addresses" : [
+          "10.149.160.5"
+        ],
+      "user" : "nutanix",
+      "password" : "nutanix/4u",
+      "nos_packages" : {
+        "5.5.7" : "nutanix_installer_package-release-euphrates-5.5.7-stable.tar",
+        "5.10.1" : "nutanix_installer_package-release-euphrates-5.10.1-stable.tar"
+      }
+    },
+    "basics":{
+      "language" : "ja-JP",
+      "nfs_whitelists" : [
+        "10.0.0.0,255.0.0.0"
+      ]
+    },
+    "containers" : [
+      "container", 
+      "NutanixManagementShare"
+    ],
+    "networks" : {
+      "test_168" : {
+        "use_dhcp" : false,
+        "vlan" : 168
+      }
+    },
+    "images" : {
+      "ISO_CENT7_MIN" : {
+        "container" : "container",
+        "url" : "nfs://10.149.245.50/Public/bootcamp/centos7_min.iso"
+      },
+      "IMG_CENT7_JPN" : {
+        "container" : "container",
+        "url" : "nfs://10.149.245.50/Public/bootcamp/centos7_jpn_raw"
+      },
+      "IMG_CENT7_ENG" : {
+        "container" : "container",
+        "url" : "nfs://10.149.245.50/Public/bootcamp/centos7_eng_raw"
+      },
+      "IMG_WIN2012R2_ENG" : {
+        "container" : "container",
+        "url" : "nfs://10.149.245.50/Public/bootcamp/win2012r2_eng_raw"
+      }
+    },
+    "alias" : {
+      "name" : "Training02",
+      "external_ip":"10.149.161.41",
+      "netmask":"255.255.252.0",
+      "gateway":"10.149.160.1",
+      "ntp_server":"ntp.nict.jp",
+      "name_server":"8.8.8.8",
+      "prism_user":"admin",
+      "prism_password":"Nutanix/4u!",
+      "nodes":[
+        {
+          "host_name":"AHV-1",
+          "position":"A",
+          "ipmi_mac":"",
+          "ipmi_ip":"10.149.161.11",
+          "host_ip":"10.149.161.21",
+          "cvm_ip":"10.149.161.31"
+        },
+        {
+          "host_name":"AHV-2",
+          "position":"B",
+          "ipmi_mac":"",
+          "ipmi_ip":"10.149.161.12",
+          "host_ip":"10.149.161.22",
+          "cvm_ip":"10.149.161.32"
+        },
+        {
+          "host_name":"AHV-3",
+          "position":"C",
+          "ipmi_mac":"",
+          "ipmi_ip":"10.149.161.13",
+          "host_ip":"10.149.161.23",
+          "cvm_ip":"10.149.161.33"
+        },
+        {
+          "host_name":"AHV-4",
+          "position":"D",
+          "ipmi_mac":"",
+          "ipmi_ip":"10.149.161.14",
+          "host_ip":"10.149.161.24",
+          "cvm_ip":"10.149.161.34"
+        }
+      ]
+    }
+  }
+]
