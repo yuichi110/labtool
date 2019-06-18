@@ -235,6 +235,7 @@ class NutanixFoundationClient:
 
       stdin, stdout, stderr = client.exec_command('/sbin/arp')
       for line in stdout:
+        line = line.lower()
         if ip_address in line:
           words = line.split()
           return words[2]

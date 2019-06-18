@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path
+from django.conf.urls import handler404
 
 from cluster.views import IndexView
 from asset.apis import AssetApi
@@ -43,6 +44,6 @@ urlpatterns = [
     path('api/tasks/', TaskApi.tasks),
     path('api/tasks/<str:uuid>', TaskApi.task),
     path('api/task_status/<str:uuid>', TaskApi.task_status),
-    
-    path('test', ClusterApi.test),
 ]
+
+handler404 = 'common.views.others'

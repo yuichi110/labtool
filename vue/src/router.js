@@ -8,6 +8,7 @@ import AssetDetailView from '@/views/AssetDetailView'
 import SegmentListView from '@/views/SegmentListView'
 import SegmentDetailView from '@/views/SegmentDetailView'
 import AnsibleView from '@/views/AnsibleView'
+import PlaybookListView from '@/views/PlaybookListView'
 import TaskListView from '@/views/TaskListView'
 
 const DEFAULT_TITLE = 'Founder';
@@ -64,6 +65,13 @@ const router = new Router({
       name: 'AnsibleView',
       component: AnsibleView,
       meta: { title: 'Ansible' }
+    },
+
+    {
+      path: '/playbooks',
+      name: 'PlaybookListView',
+      component: PlaybookListView,
+      meta: { title: 'Playbooks' }
     },
 
     {

@@ -3,7 +3,7 @@ import os
 import json
 
 URL_PREFIX = 'http://10.149.245.90:80'
-
+#URL_PREFIX = 'http://127.0.0.1:8000'
 # Change dir to Django root.
 #script_dir = os.path.dirname(__file__)
 #print('dir: ' + script_dir)
@@ -24,9 +24,6 @@ except Exception as e:
   print(e)
   exit()
 
-
-  JSON_SEGMENT_CONFIG = json.loads(open(FILE_SEGMENT_CONFIG).read())
-  JSON_CLUSTER_CONFIG = json.loads(open(FILE_CLUSTER_CONFIG).read())
 def delete_all():
   print('delete_all()')
   response = requests.get(URL_PREFIX + '/api/clusters')
@@ -77,6 +74,8 @@ def create_clusters(asset_dict, segment_dict):
     }
     request_body = json.dumps(d, indent=2)
     response = requests.post(URL_PREFIX + '/api/clusters', data=request_body)
+    uuid = response.json()['uuid']
+    print(' - {}'.format(uuid))
     del asset_dict[asset]
 
   for (asset_name, asset_uuid) in asset_dict.items():
@@ -86,7 +85,9 @@ def create_clusters(asset_dict, segment_dict):
     }
     request_body = json.dumps(d, indent=2)
     response = requests.post(URL_PREFIX + '/api/clusters', data=request_body)
-
+    uuid = response.json()['uuid']
+    print(' - {}'.format(uuid))
+    
 if __name__ == '__main__':
   delete_all()
   asset_dict = create_assets()

@@ -74,9 +74,9 @@ class FoundationOps:
       print('  Checking Node_{}'.format(position))
       
       # IP address check
-      ipmi_mac = node['ipmi_mac']
+      ipmi_mac = node['ipmi_mac'].lower()
       ipmi_ip = node['ipmi_ip']
-      result = self.client.get_mac_from_ip(ipmi_ip)
+      result = self.client.get_mac_from_ip(ipmi_ip).lower()
       if result == '':
         text = '    Success. IPMI IP address "{}" does not exist.'.format(ipmi_ip)
       elif result == ipmi_mac:

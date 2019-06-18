@@ -18,18 +18,38 @@ export default new Vuex.Store({
 
   mutations: {
     set_clusters(state, data){
+      data.sort(function(a, b){
+        if(a.name < b.name) return -1
+        if(a.name > b.name) return 1
+        return 0 
+      })
       state.clusters = data
     },
 
     set_assets(state, data){
+      data.sort(function(a, b){
+        if(a.name < b.name) return -1
+        if(a.name > b.name) return 1
+        return 0 
+      })
       state.assets = data
     },
 
     set_segments(state, data){
+      data.sort(function(a, b){
+        if(a.name < b.name) return -1
+        if(a.name > b.name) return 1
+        return 0 
+      })
       state.segments = data
     },
 
     set_playbooks(state, data){
+      data.sort(function(a, b){
+        if(a.name < b.name) return -1
+        if(a.name > b.name) return 1
+        return 0 
+      })
       state.playbooks = data
     },
 

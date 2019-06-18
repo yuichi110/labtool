@@ -9,7 +9,7 @@
       "user" : "nutanix",
       "password" : "nutanix/4u",
       "nos_packages" : {
-        "5.5.7" : "nutanix_installer_package-release-euphrates-5.5.7-stable.tar"
+        "5.10.2" : "nutanix_installer_package-release-euphrates-5.10.2-stable.tar"
       }
     },
     "basics":{

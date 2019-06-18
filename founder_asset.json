@@ -1,10 +1,73 @@
 [
   {
+    "POCID" : "2",
+    "description" : "POC02",
+    "name" : "poc02",
+    "external_ip":"10.149.2.41",
+    "netmask":"255.255.128.0",
+    "gateway":"10.149.0.1",
+    "ntp_server":"ntp.nict.jp",
+    "name_server":"8.8.8.8",
+    "prism_user":"admin",
+    "prism_password":"Nutanix/4u!",
+    "nodes":[
+      {
+        "host_name":"AHV-1",
+        "position":"A",
+        "ipmi_mac":"00:25:90:d6:05:24",
+        "ipmi_ip":"10.149.2.11",
+        "host_ip":"10.149.2.21",
+        "cvm_ip":"10.149.2.31"
+      },
+      {
+        "host_name":"AHV-2",
+        "position":"B",
+        "ipmi_mac":"00:25:90:d6:05:9e",
+        "ipmi_ip":"10.149.2.12",
+        "host_ip":"10.149.2.22",
+        "cvm_ip":"10.149.2.32"
+      },
+      {
+        "host_name":"AHV-3",
+        "position":"C",
+        "ipmi_mac":"00:25:90:d6:05:26",
+        "ipmi_ip":"10.149.2.13",
+        "host_ip":"10.149.2.23",
+        "cvm_ip":"10.149.2.33"
+      },
+      {
+        "host_name":"AHV-4",
+        "position":"D",
+        "ipmi_mac":"0c:c4:7a:45:e3:c4",
+        "ipmi_ip":"10.149.2.14",
+        "host_ip":"10.149.2.24",
+        "cvm_ip":"10.149.2.34"
+      }
+    ],
+    "networks" : {
+      "net_10.149.0.0/17" : {
+        "use_dhcp" : true,
+        "vlan" : 0,
+        "network" : "10.149.0.0",
+        "prefix" : 17,
+        "gateway" : "10.149.0.1",
+        "dns" : "8.8.8.8",
+        "pools" : [
+          {
+            "from" : "10.149.2.101",
+            "to" : "10.149.2.250"
+          }
+        ]
+      }
+    }
+  },
+
+  {
     "POCID" : "9",
     "description" : "POC09",
     "name" : "poc09",
     "external_ip":"10.149.9.41",
-    "netmask":"255.128.0.0",
+    "netmask":"255.255.128.0",
     "gateway":"10.149.0.1",
     "ntp_server":"ntp.nict.jp",
     "name_server":"8.8.8.8",
@@ -119,6 +182,69 @@
           {
             "from" : "10.149.10.101",
             "to" : "10.149.10.250"
+          }
+        ]
+      }
+    }
+  },
+
+  {
+    "POCID" : "20",
+    "description" : "POC20",
+    "name" : "poc20",
+    "external_ip":"10.149.20.41",
+    "netmask":"255.128.0.0",
+    "gateway":"10.149.0.1",
+    "ntp_server":"ntp.nict.jp",
+    "name_server":"8.8.8.8",
+    "prism_user":"admin",
+    "prism_password":"Nutanix/4u!",
+    "nodes":[
+      {
+        "host_name":"AHV-1",
+        "position":"A",
+        "ipmi_mac":"00:25:90:FE:FA:90",
+        "ipmi_ip":"10.149.20.11",
+        "host_ip":"10.149.20.21",
+        "cvm_ip":"10.149.20.31"
+      },
+      {
+        "host_name":"AHV-2",
+        "position":"B",
+        "ipmi_mac":"00:25:90:FE:FA:8E",
+        "ipmi_ip":"10.149.20.12",
+        "host_ip":"10.149.20.22",
+        "cvm_ip":"10.149.20.32"
+      },
+      {
+        "host_name":"AHV-3",
+        "position":"C",
+        "ipmi_mac":"00:25:90:FE:FA:91",
+        "ipmi_ip":"10.149.20.13",
+        "host_ip":"10.149.20.23",
+        "cvm_ip":"10.149.20.33"
+      },
+      {
+        "host_name":"AHV-4",
+        "position":"D",
+        "ipmi_mac":"00:25:90:FF:14:81",
+        "ipmi_ip":"10.149.20.14",
+        "host_ip":"10.149.20.24",
+        "cvm_ip":"10.149.20.34"
+      }
+    ],
+    "networks" : {
+      "net_10.149.0.0/17" : {
+        "use_dhcp" : true,
+        "vlan" : 0,
+        "network" : "10.149.0.0",
+        "prefix" : 17,
+        "gateway" : "10.149.0.1",
+        "dns" : "8.8.8.8",
+        "pools" : [
+          {
+            "from" : "10.149.20.101",
+            "to" : "10.149.20.250"
           }
         ]
       }

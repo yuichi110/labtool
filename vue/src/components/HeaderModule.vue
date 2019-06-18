@@ -9,10 +9,12 @@
       <b-navbar-nav>
         <b-nav-item :to="{name:'IndexView'}">Home</b-nav-item>
         <b-nav-item :to="{name:'AnsibleView'}">Run-Ansible</b-nav-item>
+        <b-nav-item :to="{name:'PlaybookListView'}">Playbooks</b-nav-item>
 
         <b-nav-item :to="{name:'ClusterListView'}">Clusters</b-nav-item>
         <b-nav-item :to="{name:'AssetListView'}">Assets</b-nav-item>
         <b-nav-item :to="{name:'SegmentListView'}">Segments</b-nav-item>
+
         <b-nav-item :to="{name:'TaskListView'}">
           Tasks
           <b-spinner 
