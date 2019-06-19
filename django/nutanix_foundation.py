@@ -300,7 +300,7 @@ class SetupOps:
     self.prism_password = cluster['prism_password']
 
   def connect_to_prism(self):
-    print('Eula-2 : Make session to Prism')
+    print('Setup-1 : Make session to Prism')
     logger = NutanixRestApiClient.create_logger('setup_cluster_rest.log', logging.DEBUG)
     try:
       self.session = NutanixRestApiClient(self.prism_ip, self.prism_user, self.prism_password, logger)
@@ -368,10 +368,16 @@ class SetupOps:
   def setup_networks(self):
     networks = []
     for (name, config_network) in self.cluster['networks'].items():
+      
       if not config_network['use_dhcp']:
-        networks.append((name, config_network['vlan']))
+        # NON DHCP
+        vlan = config_network['vlan']
+        networks.append((name, vlan))
         continue
-      network = config_network['network']
+
+      # DHCP
+      vlan = config_network['vlan']
+      network_address = config_network['network']
       prefix = config_network['prefix']
       gateway = config_network['gateway']
       dns = config_network['dns']
@@ -384,7 +390,8 @@ class SetupOps:
         if 'POCID' in config_to:
           config_to = config_to.replace('POCID', cluster['POCID'])      
         pools.append((config_from, config_to))
-      networks.append((network, prefix, gateway, dns, pools))
+      network = (name, vlan, network_address, prefix, gateway, dns, pools)
+      networks.append(network)
 
     (success, existing_networks) = self.session.get_network_names()
     if not success:
@@ -429,7 +436,7 @@ class SetupOps:
         if not success:
           raise Exception('Error happens on creating network "{}"'.format(name))
       else:
-        (ip, vlan, network, prefix, gateway, dns, pools) = network
+        (name, vlan, network, prefix, gateway, dns, pools) = network
         if hypervisor != 'AHV':
           (success, taskuuid) = self.session.create_network(name, vlan)
           if not success:

@@ -25,7 +25,7 @@
         >
           <td>{{ cluster.name }}</td>
           <td>{{ cluster.segment_name }}</td>
-          <td>{{ cluster.external_ip }}</td>
+          <td><a :href="get_external_ip_url(cluster.external_ip)" target="_blank">{{ cluster.external_ip }}</a></td>
           <td>
             <span style="color: green" v-if="physical_check_result(cluster.physical_check) == 0"><i class="fas fa-check-circle"></i></span>
             <span style="color: orange" v-else-if="physical_check_result(cluster.physical_check) == 1"><i class="fas fa-exclamation-circle"></i></span>
@@ -128,6 +128,10 @@ export default {
   },
 
   methods: {
+    get_external_ip_url: function(ip){
+      return 'http://' + ip
+    },
+    
     physical_check_result: function(checks){
       let all_ok = true
       let all_ng = true
